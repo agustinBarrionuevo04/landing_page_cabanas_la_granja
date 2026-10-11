@@ -1,0 +1,27 @@
+{
+  "origin": {
+    "address": "Av. Teresa M. de Ferrarini 1100",
+    "latLng": {
+      "lat": -31.1005613,
+      "lng": -64.4724555
+    }
+  },
+  "destination": {
+    "query": "Av. Edén 400, La Falda, Córdoba",
+    "label": "Av. Edén",
+    "sublabel": "Centro de La Falda",
+    "latLng": {
+      "lat": -31.0930606,
+      "lng": -64.4825958
+    }
+  },
+  "drive": {
+    "meters": 2240,
+    "seconds": 394,
+    "polyline": "fiy|DnhohKSI_@YQ@j@xLRxC`AjSl@bOXdFL\\kBvAeBzAc@l@kJ`IqB}AwAaAwEVuH\\kG\\SiFK{E"
+  },
+  "walk": {
+    "meters": 1706,
+    "seconds": 1480
+  }
+}

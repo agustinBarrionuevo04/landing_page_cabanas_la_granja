@@ -1,0 +1,284 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Ruta al centro</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Inter:wght@500;600;700&display=block" rel="stylesheet">
+<style>
+  :root {
+    --bg: #faf6ee; --fg: #261d16; --primary: #2d4b2e; --secondary: #ad4828;
+    --muted-fg: #61564d;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; width: 540px; height: 960px; overflow: hidden; background: var(--bg); font-family: Inter, system-ui, sans-serif; color: var(--fg); }
+  #map { position: absolute; inset: 0; }
+  /* Degradado arriba para que el título lea sobre el mapa */
+  #fade-top { position: absolute; left: 0; right: 0; top: 0; height: 260px; pointer-events: none;
+    background: linear-gradient(to bottom, rgba(250,246,238,.97) 0%, rgba(250,246,238,.85) 45%, rgba(250,246,238,0) 100%); }
+
+  #header { position: absolute; left: 28px; right: 28px; top: 44px; display: flex; gap: 16px; align-items: center; }
+  #header .logo { width: 72px; height: 72px; border-radius: 50%; background: #fff; display: grid; place-items: center;
+    box-shadow: 0 4px 14px rgba(38,29,22,.14); flex: none; }
+  #header .logo img { width: 54px; }
+  #header .eyebrow { font-size: 13px; font-weight: 600; letter-spacing: .14em; text-transform: uppercase; color: var(--secondary); }
+  #header h1 { margin: 2px 0 0; font-family: Fraunces, serif; font-weight: 600; font-size: 34px; line-height: 1.05; color: var(--primary); }
+
+  #live { position: absolute; top: 150px; left: 28px; padding: 8px 14px; border-radius: 999px; background: var(--primary);
+    color: #fff; font-weight: 600; font-size: 17px; font-variant-numeric: tabular-nums; box-shadow: 0 4px 14px rgba(38,29,22,.2); }
+
+  #card { position: absolute; left: 24px; right: 24px; bottom: 64px; padding: 22px 24px; border-radius: 22px; background: var(--bg);
+    box-shadow: 0 10px 30px rgba(38,29,22,.22); }
+  #card .row { display: flex; align-items: baseline; gap: 10px; }
+  #card .big { font-family: Fraunces, serif; font-weight: 600; font-size: 46px; color: var(--primary); line-height: 1; }
+  #card .unit { font-size: 20px; font-weight: 600; color: var(--primary); }
+  #card .sep { flex: 1; }
+  #card .km { font-size: 22px; font-weight: 700; color: var(--secondary); }
+  #card .sub { margin-top: 10px; font-size: 17px; color: var(--muted-fg); font-weight: 500; }
+  #card .addr { margin-top: 14px; padding-top: 14px; border-top: 1px solid rgba(38,29,22,.12); font-size: 15px; color: var(--muted-fg); }
+  #card .addr b { color: var(--fg); }
+
+  /* Pines (overlays propios: los íconos de marcadores de Google no cargan acá) */
+  .pin { position: absolute; transform-origin: 50% 100%; }
+  .pin .bubble { position: absolute; left: 50%; bottom: 0; translate: -50% 0; white-space: nowrap; display: flex; flex-direction: column; align-items: center; }
+  .pin .label { padding: 7px 12px; border-radius: 12px; font-weight: 700; font-size: 15px; color: #fff; box-shadow: 0 4px 12px rgba(38,29,22,.25); }
+  .pin .label small { display: block; font-weight: 500; font-size: 12px; opacity: .85; }
+  .pin .stem { width: 2px; height: 14px; }
+  .pin .dot { width: 18px; height: 18px; border-radius: 50%; border: 4px solid #fff; box-shadow: 0 2px 6px rgba(38,29,22,.35); margin-bottom: -9px; }
+  .pin.origin .label, .pin.origin .dot, .pin.origin .stem { background: var(--primary); }
+  .pin.dest .label, .pin.dest .dot, .pin.dest .stem { background: var(--secondary); }
+
+  .car { position: absolute; width: 0; height: 0; }
+  .car .halo { position: absolute; width: 44px; height: 44px; left: -22px; top: -22px; border-radius: 50%; background: rgba(173,72,40,.25); }
+  .car .core { position: absolute; width: 22px; height: 22px; left: -11px; top: -11px; border-radius: 50%; background: var(--secondary);
+    border: 4px solid #fff; box-shadow: 0 2px 8px rgba(38,29,22,.4); }
+</style>
+</head>
+<body>
+<div id="map"></div>
+<div id="fade-top"></div>
+<div id="header">
+  <div class="logo"><img src="../../cabanas-la-granja/public/logo-mark.png" alt=""></div>
+  <div>
+    <div class="eyebrow">Cabañas La Granja</div>
+    <h1>Cómo llegar<br>al centro</h1>
+  </div>
+</div>
+<div id="live">0,0 km</div>
+<div id="card">
+  <div class="row"><span class="big" id="drive-min"></span><span class="unit">min en auto</span><span class="sep"></span><span class="km" id="drive-km"></span></div>
+  <div class="sub">o unos <span id="walk-min"></span> min caminando</div>
+  <div class="addr">Desde <b id="origin-addr"></b><br>hasta <b id="dest-label"></b>, <span id="dest-sub"></span></div>
+</div>
+
+<script>
+// La ruta llega desde route.json (generado por fetch-route.js) vía boot(); ver README.md
+let ROUTE, ENCODED, ORIGIN, DEST;
+const FPS = 30, DURATION = 14;
+
+// Línea de tiempo (segundos)
+const T = { drawStart: 1.4, drawEnd: 8.6, destPop: 8.4, zoomOutStart: 9.0, zoomOutEnd: 11.0, cardIn: 10.6 };
+// Zooms enteros en las pausas: en mapas raster un zoom fraccionario escala los tiles y las etiquetas se ven borrosas
+const Z_FOLLOW = 16, Z_OVERVIEW = 15;
+
+const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
+const lerp = (a, b, t) => a + (b - a) * t;
+const prog = (t, a, b) => clamp((t - a) / (b - a));
+const easeInOut = t => t < .5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;   // cubic
+const easeOut = t => 1 - Math.pow(1 - t, 3);
+const easeOutBack = t => { const c1 = 1.5, c3 = c1 + 1; return 1 + c3 * Math.pow(t - 1, 3) + c1 * Math.pow(t - 1, 2); };
+
+let map, path, cum, total, done, rest, car, originPin, destPin, overviewCenter;
+
+function decode(str) {
+  // decodificador estándar de polilíneas de Google (precisión 1e5)
+  let i = 0, lat = 0, lng = 0; const out = [];
+  while (i < str.length) {
+    for (const k of [0, 1]) {
+      let b, shift = 0, res = 0;
+      do { b = str.charCodeAt(i++) - 63; res |= (b & 0x1f) << shift; shift += 5; } while (b >= 0x20);
+      const d = res & 1 ? ~(res >> 1) : res >> 1;
+      if (k === 0) lat += d; else lng += d;
+    }
+    out.push({ lat: lat / 1e5, lng: lng / 1e5 });
+  }
+  return out;
+}
+function haversine(a, b) {
+  const R = 6371000, r = Math.PI / 180;
+  const dLat = (b.lat - a.lat) * r, dLng = (b.lng - a.lng) * r;
+  const h = Math.sin(dLat / 2) ** 2 + Math.cos(a.lat * r) * Math.cos(b.lat * r) * Math.sin(dLng / 2) ** 2;
+  return 2 * R * Math.asin(Math.sqrt(h));
+}
+// Punto a distancia d (m) sobre la ruta + cuántos vértices quedaron atrás
+function along(d) {
+  d = clamp(d, 0, total);
+  let i = 1; while (i < cum.length - 1 && cum[i] < d) i++;
+  const f = (d - cum[i - 1]) / ((cum[i] - cum[i - 1]) || 1);
+  return { p: { lat: lerp(path[i - 1].lat, path[i].lat, f), lng: lerp(path[i - 1].lng, path[i].lng, f) }, i };
+}
+// Fracción de distancia recorrida en el tiempo t
+const driveFrac = t => easeInOut(prog(t, T.drawStart, T.drawEnd));
+// Cámara de seguimiento: promedio móvil de la posición del auto (±0.8 s) para que no dé tirones en las curvas
+function followCenter(t) {
+  let lat = 0, lng = 0, n = 0;
+  for (let k = -12; k <= 12; k++) {
+    const q = along(driveFrac(t + k / 15) * total).p; lat += q.lat; lng += q.lng; n++;
+  }
+  return { lat: lat / n, lng: lng / n };
+}
+
+const makeOverlayClass = () => class DomOverlay extends google.maps.OverlayView {
+  constructor(el, pos) { super(); this.el = el; this.pos = pos; }
+  onAdd() { this.getPanes().floatPane.appendChild(this.el); }
+  draw() {
+    const pt = this.getProjection().fromLatLngToDivPixel(new google.maps.LatLng(this.pos));
+    if (pt) { this.el.style.left = pt.x + 'px'; this.el.style.top = pt.y + 'px'; }
+  }
+  setPos(p) { this.pos = p; this.draw(); }
+};
+function makePin(cls, title, small) {
+  const el = document.createElement('div');
+  el.className = 'pin ' + cls;
+  el.innerHTML = `<div class="bubble"><div class="label">${title}<small>${small}</small></div><div class="stem"></div><div class="dot"></div></div>`;
+  return el;
+}
+
+// OverlayView solo existe una vez cargada la API
+window.initMap = () => { window.DomOverlayCls = makeOverlayClass(); };
+
+function setup() {
+  path = decode(ENCODED);
+  cum = [0]; for (let i = 1; i < path.length; i++) cum.push(cum[i - 1] + haversine(path[i - 1], path[i]));
+  total = cum[cum.length - 1];
+
+  map = new google.maps.Map(document.getElementById('map'), {
+    center: ORIGIN, zoom: Z_FOLLOW, disableDefaultUI: true, keyboardShortcuts: false, gestureHandling: 'none',
+    isFractionalZoomEnabled: true, clickableIcons: false,
+    styles: [
+      { featureType: 'poi', elementType: 'labels.icon', stylers: [{ visibility: 'off' }] },
+      { featureType: 'poi.business', stylers: [{ visibility: 'off' }] },
+      { featureType: 'poi.park', elementType: 'geometry', stylers: [{ color: '#d9e6cf' }] },
+      { featureType: 'landscape', elementType: 'geometry', stylers: [{ color: '#f4efe4' }] },
+      { featureType: 'road', elementType: 'geometry', stylers: [{ color: '#ffffff' }] },
+      { featureType: 'road.highway', elementType: 'geometry', stylers: [{ color: '#e9dcc7' }] },
+      { featureType: 'road', elementType: 'labels.text.fill', stylers: [{ color: '#5b5048' }] },
+      { featureType: 'water', elementType: 'geometry', stylers: [{ color: '#bcd6dc' }] },
+      { featureType: 'transit', stylers: [{ visibility: 'off' }] },
+    ],
+  });
+
+  // Ruta completa tenue (anticipa el recorrido) + tramo recorrido con borde blanco
+  rest = new google.maps.Polyline({ map, path, strokeColor: '#2d4b2e', strokeOpacity: 0, zIndex: 1,
+    icons: [{ icon: { path: 'M 0,-1 0,1', strokeOpacity: .45, strokeColor: '#2d4b2e', scale: 3 }, offset: '0', repeat: '14px' }] });
+  const casing = new google.maps.Polyline({ map, path: [], strokeColor: '#ffffff', strokeWeight: 11, strokeOpacity: 1, zIndex: 2 });
+  done = new google.maps.Polyline({ map, path: [], strokeColor: '#2d4b2e', strokeWeight: 6.5, strokeOpacity: 1, zIndex: 3 });
+  done.casing = casing;
+
+  const Ov = window.DomOverlayCls;
+  originPin = new Ov(makePin('origin', 'Cabañas La Granja', ROUTE.origin.address), ORIGIN); originPin.setMap(map);
+  destPin = new Ov(makePin('dest', ROUTE.destination.label, ROUTE.destination.sublabel), DEST); destPin.setMap(map);
+  const carEl = document.createElement('div'); carEl.className = 'car'; carEl.innerHTML = '<div class="halo"></div><div class="core"></div>';
+  car = new Ov(carEl, ORIGIN); car.setMap(map);
+
+  const lats = path.map(p => p.lat), lngs = path.map(p => p.lng);
+  // Centro del plano general, corrido un poco hacia el sur para dejar lugar al título arriba y la tarjeta abajo
+  overviewCenter = { lat: (Math.min(...lats) + Math.max(...lats)) / 2 - 0.0012, lng: (Math.min(...lngs) + Math.max(...lngs)) / 2 + 0.0004 };
+}
+
+// Espera a que los tiles visibles estén descargados: cantidad de <img> estable y todas completas durante 300 ms
+function waitTiles(timeout = 8000) {
+  return new Promise(res => {
+    const t0 = performance.now(); let stable = 0, lastN = -1;
+    const check = () => {
+      // solo tiles del mapa: las imágenes de maps.gstatic.com las bloquea el proxy y nunca completan
+      const imgs = [...document.querySelectorAll('#map img')].filter(i => i.src.includes('googleapis.com'));
+      const ok = imgs.every(i => i.complete && i.naturalWidth > 0);
+      stable = ok && imgs.length === lastN ? stable + 1 : 0; lastN = imgs.length;
+      if (stable >= 3 || performance.now() - t0 > timeout) requestAnimationFrame(() => requestAnimationFrame(res));
+      else setTimeout(check, 100);
+    };
+    check();
+  });
+}
+
+let lastCam = '';
+window.renderAt = async (t) => {
+  const d = driveFrac(t) * total;
+  const { p, i } = along(d);
+
+  // Tramo recorrido
+  const trail = path.slice(0, i).concat([p]);
+  done.setPath(trail); done.casing.setPath(trail);
+  car.setPos(p);
+  car.el.style.opacity = t < T.drawStart - .3 ? 0 : 1;
+  const pulse = (Math.sin(t * Math.PI * 2 / 1.2) + 1) / 2;
+  car.el.querySelector('.halo').style.scale = String(1 + pulse * .5);
+  car.el.querySelector('.halo').style.opacity = String(1 - pulse * .6);
+
+  // Pines
+  const o = easeOutBack(prog(t, 0.3, 0.9));
+  originPin.el.style.scale = String(o); originPin.el.style.opacity = String(clamp(o * 2));
+  const dp = easeOutBack(prog(t, T.destPop, T.destPop + .55));
+  destPin.el.style.scale = String(dp); destPin.el.style.opacity = String(clamp(dp * 2));
+
+  // Cámara: sigue al auto y al final se aleja al plano general
+  const z = prog(t, T.zoomOutStart, T.zoomOutEnd), ze = easeInOut(z);
+  const f = followCenter(Math.min(t, T.zoomOutStart));
+  const center = { lat: lerp(f.lat, overviewCenter.lat, ze), lng: lerp(f.lng, overviewCenter.lng, ze) };
+  const zoom = lerp(lerp(Z_FOLLOW - .3, Z_FOLLOW, easeInOut(prog(t, 0, T.drawStart + 1))), Z_OVERVIEW, ze);
+  const cam = center.lat.toFixed(8) + center.lng.toFixed(8) + zoom.toFixed(4);
+  let idle = Promise.resolve(), changed = cam !== lastCam;
+  if (cam !== lastCam) {
+    idle = new Promise(r => { google.maps.event.addListenerOnce(map, 'idle', r); setTimeout(r, 4000); });
+    map.moveCamera({ center, zoom }); lastCam = cam;
+  }
+
+  // Textos
+  const h = easeOut(prog(t, 0.1, 0.8));
+  const header = document.getElementById('header');
+  header.style.opacity = h; header.style.translate = `0 ${(1 - h) * -16}px`;
+  document.getElementById('fade-top').style.opacity = h;
+
+  const live = document.getElementById('live');
+  const lv = easeOut(prog(t, T.drawStart - .4, T.drawStart)) * (1 - prog(t, T.cardIn - .4, T.cardIn));
+  live.style.opacity = lv; live.style.translate = `0 ${(1 - easeOut(prog(t, T.drawStart - .4, T.drawStart))) * 10}px`;
+  live.textContent = (d / 1000).toFixed(1).replace('.', ',') + ' km';
+
+  const c = easeOut(prog(t, T.cardIn, T.cardIn + .6));
+  const card = document.getElementById('card');
+  card.style.opacity = c; card.style.translate = `0 ${(1 - c) * 40}px`;
+
+  await idle;
+  if (changed) await waitTiles();
+};
+
+function fillCard() {
+  const $ = id => document.getElementById(id);
+  $('drive-min').textContent = Math.round(ROUTE.drive.seconds / 60);
+  $('drive-km').textContent = (ROUTE.drive.meters / 1000).toFixed(1).replace('.', ',') + ' km';
+  $('walk-min').textContent = Math.round(ROUTE.walk.seconds / 60 / 5) * 5;   // a pie, redondeado a 5 min
+  $('origin-addr').textContent = ROUTE.origin.address;
+  $('dest-label').textContent = ROUTE.destination.label;
+  const sub = ROUTE.destination.sublabel;
+  $('dest-sub').textContent = sub.charAt(0).toLowerCase() + sub.slice(1);
+}
+
+window.boot = async (key, route) => {
+  ROUTE = route; ENCODED = route.drive.polyline; ORIGIN = route.origin.latLng; DEST = route.destination.latLng;
+  fillCard();
+  await new Promise((res, rej) => {
+    window.__mapsReady = res;
+    const s = document.createElement('script');
+    s.src = `https://maps.googleapis.com/maps/api/js?key=${key}&callback=__mapsReady&language=es&region=AR&v=weekly`;
+    s.onerror = rej; document.head.appendChild(s);
+  });
+  window.initMap();
+  setup();
+  await new Promise(r => google.maps.event.addListenerOnce(map, 'tilesloaded', r));
+  await document.fonts.ready;
+  window.META = { FPS, DURATION };
+};
+</script>
+</body>
+</html>

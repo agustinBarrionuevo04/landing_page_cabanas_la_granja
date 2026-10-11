@@ -19,6 +19,7 @@ cabanas-la-granja/
   public/         fotos y logos
   test/           tests de Vitest + Testing Library
 plans/            planes de trabajo (`/planear`)
+video/ruta-al-centro/  generador del video vertical de la ruta complejo → Av. Edén (Google Maps + Playwright + ffmpeg; ver su README)
 ```
 
 ## Comandos
