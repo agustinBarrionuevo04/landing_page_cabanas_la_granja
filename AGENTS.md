@@ -35,6 +35,7 @@ Notas verificadas:
 - Con pnpm 11, `pnpm install` termina con `ERR_PNPM_IGNORED_BUILDS` (pide `allowBuilds` en `pnpm-workspace.yaml`) y modifica ese archivo con valores de ejemplo. Las dependencias igual quedan instaladas; revertí el cambio en `pnpm-workspace.yaml`.
 - Por ese mismo chequeo, `pnpm test` / `pnpm build` fallan antes de correr. Usá los binarios directos de la tabla.
 - `pnpm lint` (`next lint`) **no está configurado**: no hay config de ESLint y el comando abre un asistente interactivo. No hay lint por ahora.
+- No corras `next build` con `next dev` levantado: los dos usan `.next/` y el build deja al servidor de desarrollo sirviendo el CSS con 404 (la página se ve sin estilos). Si pasa, frená el dev, borrá `.next/` y volvé a levantarlo.
 - `next.config.mjs` tiene `typescript.ignoreBuildErrors` y `eslint.ignoreDuringBuilds` en `true`: **el build no detecta errores de tipos**. Corré siempre `tsc --noEmit` antes de dar algo por terminado.
 
 ## Convenciones
