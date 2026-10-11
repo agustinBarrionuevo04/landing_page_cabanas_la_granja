@@ -15,17 +15,43 @@ const fraunces = Fraunces({
   display: "swap",
 })
 
+// Las vistas previas de WhatsApp/Instagram necesitan URLs absolutas. Vercel completa
+// VERCEL_PROJECT_PRODUCTION_URL en cada build con el dominio de producción.
+const siteUrl =
+  process.env.NEXT_PUBLIC_SITE_URL ??
+  (process.env.VERCEL_PROJECT_PRODUCTION_URL
+    ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`
+    : "http://localhost:3000")
+
+const title = "Cabañas la Granja · La Falda, Córdoba"
+const shareDescription = "Cabañas con piletas, 10.000 m² de parque y vista a las sierras en La Falda, Córdoba."
+const shareImage = {
+  url: "/og-image.jpg",
+  width: 1200,
+  height: 630,
+  alt: "Piletas de Cabañas la Granja rodeadas de parque y cabañas",
+}
+
 export const metadata: Metadata = {
-  title: "Cabañas la Granja · La Falda, Córdoba",
+  metadataBase: new URL(siteUrl),
+  title,
   description:
     "Cabañas en La Falda, Córdoba, con piletas, 10.000 m² de parque y vista a las sierras. El lugar para desconectar en familia, en pareja o con amigos.",
   icons: { icon: "/logo_80x80.png" },
   openGraph: {
-    title: "Cabañas la Granja · La Falda, Córdoba",
-    description: "Cabañas con piletas, parque y vista a las sierras en La Falda, Córdoba.",
-    images: ["/fondo_principal.jpeg"],
+    title,
+    description: shareDescription,
+    url: "/",
+    siteName: "Cabañas la Granja",
+    images: [shareImage],
     locale: "es_AR",
     type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title,
+    description: shareDescription,
+    images: [shareImage],
   },
 }
 
