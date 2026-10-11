@@ -23,6 +23,8 @@ export const site = {
   mapsDirections:
     "https://www.google.com/maps/dir/?api=1&destination=Caba%C3%B1as%20La%20Granja%2C%20La%20Falda%2C%20C%C3%B3rdoba",
   hours: "Lunes a domingo, de 8 a 22 h",
+  // Ruta al centro (Routes API, ver video/ruta-al-centro/route.json); el video la muestra
+  downtown: { name: "Av. Edén", driveMinutes: 4, km: "1,5", walkMinutes: 20 },
   // Para los datos estructurados; los textos visibles viven en amenities-section.tsx
   amenities: [
     "Cocina completamente equipada",
