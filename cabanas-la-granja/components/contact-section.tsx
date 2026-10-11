@@ -1,156 +1,127 @@
 "use client"
 
 import type React from "react"
-
 import { useState } from "react"
+import { Clock, Instagram, Mail, Phone } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
-import { MapPin, Phone, Mail, Clock } from "lucide-react"
+import { SectionHeading } from "@/components/section-heading"
+import { site, whatsappUrl } from "@/lib/site"
 
 export function ContactSection() {
-  const [formData, setFormData] = useState({
-    name: "",
-    //email: "",
-    message: "",
-  })
+  const [formData, setFormData] = useState({ name: "", message: "" })
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-    // Create WhatsApp message
     const message = `Hola! Me interesa hacer una reserva en Cabañas la Granja.
-    
+
 Nombre: ${formData.name}
 Consulta: ${formData.message}`
 
-    const whatsappUrl = `https://wa.me/5493548526883?text=${encodeURIComponent(message)}`
-    window.open(whatsappUrl, "_blank")
+    window.open(whatsappUrl(message), "_blank", "noopener,noreferrer")
   }
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value,
-    })
+    setFormData({ ...formData, [e.target.name]: e.target.value })
   }
 
+  const channels = [
+    {
+      icon: Phone,
+      title: "Teléfonos",
+      content: (
+        <span className="flex flex-col">
+          {site.phones.map((phone) => (
+            <a key={phone.href} href={phone.href} className="hover:text-primary">
+              {phone.label}
+            </a>
+          ))}
+        </span>
+      ),
+    },
+    {
+      icon: Mail,
+      title: "Email",
+      content: (
+        <a href={`mailto:${site.email}`} className="break-all hover:text-primary">
+          {site.email}
+        </a>
+      ),
+    },
+    {
+      icon: Instagram,
+      title: "Instagram",
+      content: (
+        <a href={site.instagram} target="_blank" rel="noopener noreferrer" className="hover:text-primary">
+          {site.instagramHandle}
+        </a>
+      ),
+    },
+    { icon: Clock, title: "Horarios de atención", content: site.hours },
+  ]
+
   return (
-    <section id="contacto" className="py-20 bg-background">
-      <div className="container mx-auto px-4">
-        <div className="text-center mb-16">
-          <h2 className="text-4xl md:text-5xl font-bold text-foreground mb-6">Contacto y reservas</h2>
-          <p className="text-xl text-muted-foreground max-w-3xl mx-auto text-pretty leading-relaxed">
-            ¿Listo para vivir una experiencia única? Contáctanos para hacer tu reserva o resolver cualquier consulta que
-            tengas.
-          </p>
+    <section id="contacto" className="py-24 md:py-32">
+      <div className="container mx-auto grid gap-14 px-4 lg:grid-cols-12 lg:gap-10">
+        <div className="lg:col-span-5">
+          <SectionHeading
+            eyebrow="Contacto y reservas"
+            title="¿Listo para tu próxima escapada?"
+            description="Escribinos para reservar o para cualquier consulta. Te respondemos por WhatsApp."
+          />
+
+          <dl className="mt-10 grid gap-x-8 sm:grid-cols-2 lg:grid-cols-1">
+            {channels.map(({ icon: Icon, title, content }, index) => (
+              <div
+                key={title}
+                data-reveal="up"
+                style={{ "--i": index } as React.CSSProperties}
+                className="flex gap-4 border-t py-5"
+              >
+                <Icon className="mt-0.5 size-5 shrink-0 text-secondary" aria-hidden />
+                <div>
+                  <dt className="text-sm text-muted-foreground">{title}</dt>
+                  <dd className="mt-1 text-base">{content}</dd>
+                </div>
+              </div>
+            ))}
+          </dl>
         </div>
 
-        <div className="grid lg:grid-cols-2 gap-12">
-          {/* Contact Form */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-2xl">Envíanos tu consulta</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <form onSubmit={handleSubmit} className="space-y-6">
-                <div>
-                  <Input
-                    name="name"
-                    placeholder="Tu nombre completo"
-                    value={formData.name}
-                    onChange={handleChange}
-                    required
-                    className="w-full"
-                  />
-                </div>
-                {/* <div>
-                  <Input
-                    name="email"
-                    type="email"
-                    placeholder="Tu email"
-                    value={formData.email}
-                    onChange={handleChange}
-                    required
-                    className="w-full"
-                  />
-                </div> */}
-                <div>
-                  <Textarea
-                    name="message"
-                    placeholder="Cuéntanos sobre tu estadía ideal: fechas, cantidad de personas, necesidades especiales..."
-                    value={formData.message}
-                    onChange={handleChange}
-                    required
-                    className="w-full min-h-32"
-                  />
-                </div>
-                <Button type="submit" className="w-full bg-primary text-primary-foreground hover:bg-primary/90">
-                  Enviar consulta por WhatsApp
-                </Button>
-              </form>
-            </CardContent>
-          </Card>
-
-          {/* Contact Information */}
-          <div className="space-y-8">
-            {/* <Card>
-              <CardContent className="p-6">
-                <div className="flex items-start space-x-4">
-                  <MapPin className="w-6 h-6 text-primary mt-1" />
-                  <div>
-                    <h3 className="font-semibold text-lg mb-2">Ubicación</h3>
-                    <p className="text-muted-foreground leading-relaxed">
-                      La Falda, Córdoba, Argentina
-                      <br />
-                      Av. Ferrarini al 1100.
-                    </p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card> */}
-
-            <Card>
-              <CardContent className="p-6">
-                <div className="flex items-start space-x-4">
-                  <Phone className="w-6 h-6 text-primary mt-1" />
-                  <div>
-                    <h3 className="font-semibold text-lg mb-2">Teléfonos</h3>
-                    <p className="text-muted-foreground">+54 9 3548 526883
-                      <br />
-                      +54 9 3548571607 </p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardContent className="p-6">
-                <div className="flex items-start space-x-4">
-                  <Mail className="w-6 h-6 text-primary mt-1" />
-                  <div>
-                    <h3 className="font-semibold text-lg mb-2">Email</h3>
-                    <p className="text-muted-foreground">cabana-lagranja@hotmail.com</p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardContent className="p-6">
-                <div className="flex items-start space-x-4">
-                  <Clock className="w-6 h-6 text-primary mt-1" />
-                  <div>
-                    <h3 className="font-semibold text-lg mb-2">Horarios de atención</h3>
-                    <p className="text-muted-foreground leading-relaxed">
-                      Lunes a Domingo: 8:00 - 22:00
-                      <br />
-                    </p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
+        <div data-reveal="up" className="lg:col-span-6 lg:col-start-7">
+          <form onSubmit={handleSubmit} className="space-y-6 rounded-2xl border bg-card p-6 shadow-sm md:p-10">
+            <h3 className="font-display text-2xl font-medium">Envianos tu consulta</h3>
+            <div className="space-y-2">
+              <Label htmlFor="contact-name">Nombre</Label>
+              <Input
+                id="contact-name"
+                name="name"
+                autoComplete="name"
+                placeholder="Tu nombre y apellido"
+                value={formData.name}
+                onChange={handleChange}
+                required
+                className="h-12 bg-background text-base"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="contact-message">Consulta</Label>
+              <Textarea
+                id="contact-message"
+                name="message"
+                placeholder="Contanos sobre tu estadía ideal: fechas, cantidad de personas, si venís con mascota…"
+                value={formData.message}
+                onChange={handleChange}
+                required
+                className="min-h-36 bg-background text-base"
+              />
+            </div>
+            <Button type="submit" className="h-12 w-full rounded-full text-base">
+              Enviar consulta por WhatsApp
+            </Button>
+          </form>
         </div>
       </div>
     </section>

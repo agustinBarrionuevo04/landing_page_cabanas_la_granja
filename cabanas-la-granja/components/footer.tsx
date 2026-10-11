@@ -1,86 +1,72 @@
-"use client"
-
-import { MapPin, Phone, Mail } from "lucide-react"
+import { Instagram, Mail, MapPin, Phone } from "lucide-react"
+import { navLinks, site } from "@/lib/site"
 
 export function Footer() {
   return (
-    <footer className="bg-foreground text-background py-12">
-      <div className="container mx-auto px-4">
-        <div className="grid md:grid-cols-3 gap-8">
-          {/* Brand */}
-          <div>
-            <div className="flex items-center space-x-2 mb-4">
-              <div className="w-10 h-10 bg-primary rounded-lg flex items-center justify-center">
-                <img
-                  src="/logo_80x80.png"
-                  alt="Logo Cabañas la Granja"
-                  className="w-full h-full object-contain"
-                />
-              </div>
+    <footer className="bg-primary text-primary-foreground">
+      <div className="container mx-auto px-4 py-16">
+        <div className="grid gap-12 md:grid-cols-12">
+          <div className="md:col-span-5">
+            <div className="flex items-center gap-3">
+              <img src="/logo-mark.png" alt="" width={61} height={36} className="h-9 w-auto invert" />
               <div>
-                <h3 className="text-xl font-bold">Cabañas la Granja</h3>
-                <p className="text-sm opacity-80">La Falda, Córdoba</p>
+                <p className="font-display text-xl font-medium">{site.name}</p>
+                <p className="text-sm text-primary-foreground/70">{site.city}</p>
               </div>
             </div>
-            <p className="text-sm opacity-80 leading-relaxed">
-              Tu refugio perfecto en las sierras cordobesas. Donde la tranquilidad y el confort se encuentran en armonía
-              con la naturaleza.
+            <p className="mt-6 max-w-sm text-sm leading-relaxed text-primary-foreground/70">
+              Tu refugio en las sierras cordobesas, donde la tranquilidad y el confort se encuentran con la naturaleza.
             </p>
           </div>
 
-          {/* Contact Info */}
-          <div>
-            <h4 className="text-lg font-semibold mb-4">Información de contacto</h4>
-            <div className="space-y-3">
-              <div className="flex items-center space-x-3">
-                <MapPin className="w-4 h-4 opacity-80" />
-                <span className="text-sm">La Falda, Córdoba, Argentina</span>
-              </div>
-              <div className="flex items-center space-x-3">
-                <Phone className="w-4 h-4 opacity-80" />
-                <span className="text-sm">+54 9 3548 526883</span>
-              </div>
-              <div className="flex items-center space-x-3">
-                <Mail className="w-4 h-4 opacity-80" />
-                <span className="text-sm">cabana-lagranja@hotmail.com</span>
-              </div>
-            </div>
+          <div className="md:col-span-4">
+            <h2 className="text-xs font-semibold uppercase tracking-[0.2em] text-primary-foreground/60">Contacto</h2>
+            <ul className="mt-5 space-y-3 text-sm">
+              <li className="flex items-start gap-3">
+                <MapPin className="mt-0.5 size-4 shrink-0 opacity-70" aria-hidden />
+                <a href={site.mapsDirections} target="_blank" rel="noopener noreferrer" className="hover:underline">
+                  {site.address}
+                </a>
+              </li>
+              <li className="flex items-center gap-3">
+                <Phone className="size-4 shrink-0 opacity-70" aria-hidden />
+                <a href={site.phones[0].href} className="hover:underline">
+                  {site.phones[0].label}
+                </a>
+              </li>
+              <li className="flex items-center gap-3">
+                <Mail className="size-4 shrink-0 opacity-70" aria-hidden />
+                <a href={`mailto:${site.email}`} className="break-all hover:underline">
+                  {site.email}
+                </a>
+              </li>
+              <li className="flex items-center gap-3">
+                <Instagram className="size-4 shrink-0 opacity-70" aria-hidden />
+                <a href={site.instagram} target="_blank" rel="noopener noreferrer" className="hover:underline">
+                  {site.instagramHandle}
+                </a>
+              </li>
+            </ul>
           </div>
 
-          {/* Quick Links */}
-          <div>
-            <h4 className="text-lg font-semibold mb-4">Enlaces rápidos</h4>
-            <div className="space-y-2">
-              <button
-                onClick={() => document.getElementById("nosotros")?.scrollIntoView({ behavior: "smooth" })}
-                className="block text-sm opacity-80 hover:opacity-100 transition-opacity"
-              >
-                Sobre nosotros
-              </button>
-              <button
-                onClick={() => document.getElementById("servicios")?.scrollIntoView({ behavior: "smooth" })}
-                className="block text-sm opacity-80 hover:opacity-100 transition-opacity"
-              >
-                Servicios
-              </button>
-              <button
-                onClick={() => document.getElementById("galeria")?.scrollIntoView({ behavior: "smooth" })}
-                className="block text-sm opacity-80 hover:opacity-100 transition-opacity"
-              >
-                Galería
-              </button>
-              <button
-                onClick={() => document.getElementById("contacto")?.scrollIntoView({ behavior: "smooth" })}
-                className="block text-sm opacity-80 hover:opacity-100 transition-opacity"
-              >
-                Contacto
-              </button>
-            </div>
-          </div>
+          <nav aria-label="Pie de página" className="md:col-span-3">
+            <h2 className="text-xs font-semibold uppercase tracking-[0.2em] text-primary-foreground/60">Secciones</h2>
+            <ul className="mt-5 space-y-3 text-sm">
+              {navLinks.map(({ id, label }) => (
+                <li key={id}>
+                  <a href={`#${id}`} className="text-primary-foreground/80 hover:text-primary-foreground">
+                    {label}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </nav>
         </div>
 
-        <div className="border-t border-background/20 mt-8 pt-8 text-center">
-          <p className="text-sm opacity-80">© 2025 Cabañas la Granja. Todos los derechos reservados.</p>
+        <div className="mt-14 border-t border-primary-foreground/15 pt-8 text-sm text-primary-foreground/60">
+          <p suppressHydrationWarning>
+            © {new Date().getFullYear()} {site.name}. Todos los derechos reservados.
+          </p>
         </div>
       </div>
     </footer>
