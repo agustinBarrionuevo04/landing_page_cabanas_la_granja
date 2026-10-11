@@ -6,6 +6,8 @@ import { Fraunces } from "next/font/google"
 import { Analytics } from "@vercel/analytics/next"
 import { Suspense } from "react"
 import { RevealObserver } from "@/components/reveal-observer"
+import { site } from "@/lib/site"
+import { lodgingBusinessJsonLd } from "@/lib/structured-data"
 import "./globals.css"
 
 const fraunces = Fraunces({
@@ -14,14 +16,6 @@ const fraunces = Fraunces({
   axes: ["opsz"],
   display: "swap",
 })
-
-// Las vistas previas de WhatsApp/Instagram necesitan URLs absolutas. Vercel completa
-// VERCEL_PROJECT_PRODUCTION_URL en cada build con el dominio de producción.
-const siteUrl =
-  process.env.NEXT_PUBLIC_SITE_URL ??
-  (process.env.VERCEL_PROJECT_PRODUCTION_URL
-    ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`
-    : "http://localhost:3000")
 
 const title = "Cabañas la Granja · La Falda, Córdoba"
 const shareDescription = "Cabañas con piletas, 10.000 m² de parque y vista a las sierras en La Falda, Córdoba."
@@ -33,7 +27,9 @@ const shareImage = {
 }
 
 export const metadata: Metadata = {
-  metadataBase: new URL(siteUrl),
+  // Las vistas previas de WhatsApp/Instagram y el canonical necesitan URLs absolutas
+  metadataBase: new URL(site.url),
+  alternates: { canonical: "/" },
   title,
   description:
     "Cabañas en La Falda, Córdoba, con piletas, 10.000 m² de parque y vista a las sierras. El lugar para desconectar en familia, en pareja o con amigos.",
@@ -71,6 +67,10 @@ export default function RootLayout({
         <script dangerouslySetInnerHTML={{ __html: "document.documentElement.classList.add('js')" }} />
       </head>
       <body className={`font-sans ${GeistSans.variable} ${GeistMono.variable} ${fraunces.variable}`}>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(lodgingBusinessJsonLd()).replace(/</g, "\\u003c") }}
+        />
         <Suspense fallback={null}>{children}</Suspense>
         <RevealObserver />
         <Analytics />
