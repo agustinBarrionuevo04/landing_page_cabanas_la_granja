@@ -4,80 +4,48 @@
 @custom-variant dark (&:is(.dark *));
 
 :root {
-  /* Updated color palette for Cabañas la Granja with nature-inspired colors */
-  --background: oklch(1 0 0); /* White background */
-  --foreground: oklch(0.35 0 0); /* Dark gray text (#4b5563) */
-  --card: oklch(0.98 0 0); /* Light gray card background (#f9fafb) */
-  --card-foreground: oklch(0.35 0 0); /* Dark gray text on cards */
-  --popover: oklch(1 0 0); /* White popover background */
-  --popover-foreground: oklch(0.35 0 0); /* Dark gray popover text */
-  --primary: oklch(0.55 0.15 200); /* Cyan primary color (#0891b2) */
-  --primary-foreground: oklch(1 0 0); /* White text on primary */
-  --secondary: oklch(0.75 0.15 85); /* Amber secondary color (#f59e0b) */
-  --secondary-foreground: oklch(1 0 0); /* White text on secondary */
-  --muted: oklch(0.98 0 0); /* Light gray muted background */
-  --muted-foreground: oklch(0.35 0 0); /* Dark gray muted text */
-  --accent: oklch(0.75 0.15 85); /* Amber accent color */
-  --accent-foreground: oklch(0.35 0 0); /* Dark gray accent text */
+  /* Paleta "sierras": crema, verde monte y terracota (los postigos de las cabañas) */
+  --background: oklch(0.975 0.012 85); /* crema */
+  --foreground: oklch(0.24 0.02 60); /* casi negro cálido */
+  --card: oklch(0.99 0.006 85);
+  --card-foreground: oklch(0.24 0.02 60);
+  --popover: oklch(0.99 0.006 85);
+  --popover-foreground: oklch(0.24 0.02 60);
+  --primary: oklch(0.38 0.06 145); /* verde monte */
+  --primary-foreground: oklch(0.975 0.012 85);
+  --secondary: oklch(0.53 0.14 38); /* terracota */
+  --secondary-foreground: oklch(0.99 0.006 85);
+  --muted: oklch(0.945 0.018 85); /* arena */
+  --muted-foreground: oklch(0.46 0.02 60);
+  --accent: oklch(0.92 0.03 140); /* verde muy claro para hovers */
+  --accent-foreground: oklch(0.24 0.02 60);
   --destructive: oklch(0.577 0.245 27.325);
   --destructive-foreground: oklch(1 0 0);
-  --border: oklch(0.92 0 0); /* Light border color (#e5e7eb) */
-  --input: oklch(0.98 0 0); /* Light gray input background */
-  --ring: oklch(0.55 0.15 200 / 0.5); /* Cyan focus ring with transparency */
-  --chart-1: oklch(0.55 0.15 200); /* Cyan chart color */
-  --chart-2: oklch(0.75 0.15 85); /* Amber chart color */
-  --chart-3: oklch(0.35 0 0); /* Dark gray chart color */
-  --chart-4: oklch(0.577 0.245 27.325); /* Red chart color */
-  --chart-5: oklch(0.6 0.2 270); /* Purple chart color */
-  --radius: 0.5rem;
-  --sidebar: oklch(0.98 0 0);
-  --sidebar-foreground: oklch(0.35 0 0);
-  --sidebar-primary: oklch(0.55 0.15 200);
-  --sidebar-primary-foreground: oklch(1 0 0);
-  --sidebar-accent: oklch(0.75 0.15 85);
-  --sidebar-accent-foreground: oklch(0.35 0 0);
-  --sidebar-border: oklch(0.92 0 0);
-  --sidebar-ring: oklch(0.55 0.15 200 / 0.3);
-}
+  --border: oklch(0.89 0.015 80);
+  --input: oklch(0.99 0.006 85);
+  --ring: oklch(0.38 0.06 145 / 0.5);
+  --chart-1: oklch(0.38 0.06 145);
+  --chart-2: oklch(0.53 0.14 38);
+  --chart-3: oklch(0.24 0.02 60);
+  --chart-4: oklch(0.7 0.1 85);
+  --chart-5: oklch(0.6 0.08 230);
+  --radius: 0.75rem;
+  --sidebar: oklch(0.975 0.012 85);
+  --sidebar-foreground: oklch(0.24 0.02 60);
+  --sidebar-primary: oklch(0.38 0.06 145);
+  --sidebar-primary-foreground: oklch(0.975 0.012 85);
+  --sidebar-accent: oklch(0.92 0.03 140);
+  --sidebar-accent-foreground: oklch(0.24 0.02 60);
+  --sidebar-border: oklch(0.89 0.015 80);
+  --sidebar-ring: oklch(0.38 0.06 145 / 0.3);
 
-.dark {
-  --background: oklch(0.145 0 0);
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.145 0 0);
-  --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.145 0 0);
-  --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.985 0 0);
-  --primary-foreground: oklch(0.205 0 0);
-  --secondary: oklch(0.269 0 0);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.269 0 0);
-  --muted-foreground: oklch(0.708 0 0);
-  --accent: oklch(0.269 0 0);
-  --accent-foreground: oklch(0.985 0 0);
-  --destructive: oklch(0.396 0.141 25.723);
-  --destructive-foreground: oklch(0.637 0.237 25.331);
-  --border: oklch(0.269 0 0);
-  --input: oklch(0.269 0 0);
-  --ring: oklch(0.439 0 0);
-  --chart-1: oklch(0.488 0.243 264.376);
-  --chart-2: oklch(0.696 0.17 162.48);
-  --chart-3: oklch(0.769 0.188 70.08);
-  --chart-4: oklch(0.627 0.265 303.9);
-  --chart-5: oklch(0.645 0.246 16.439);
-  --sidebar: oklch(0.205 0 0);
-  --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: oklch(0.488 0.243 264.376);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.269 0 0);
-  --sidebar-accent-foreground: oklch(0.985 0 0);
-  --sidebar-border: oklch(0.269 0 0);
-  --sidebar-ring: oklch(0.439 0 0);
+  --header-height: 4.5rem;
 }
 
 @theme inline {
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+  --font-display: var(--font-fraunces);
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-card: var(--card);
@@ -114,13 +82,144 @@
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
+
+  /* Curvas fuertes: las de CSS por defecto se sienten flojas */
+  --ease-out-strong: cubic-bezier(0.23, 1, 0.32, 1);
+  --ease-in-out-strong: cubic-bezier(0.77, 0, 0.175, 1);
+  --ease-drawer: cubic-bezier(0.32, 0.72, 0, 1);
 }
 
 @layer base {
   * {
     @apply border-border outline-ring/50;
   }
+  html {
+    scroll-padding-top: var(--header-height);
+    -webkit-tap-highlight-color: transparent;
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    html {
+      scroll-behavior: smooth;
+    }
+  }
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground antialiased;
+  }
+  h1,
+  h2,
+  h3 {
+    text-wrap: balance;
+  }
+  p {
+    text-wrap: pretty;
+  }
+  ::selection {
+    background: oklch(0.38 0.06 145 / 0.2);
+  }
+}
+
+/* ---------- Animación de carga del hero (una sola vez) ---------- */
+
+@keyframes hero-in {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+}
+
+.hero-in {
+  animation: hero-in 900ms var(--ease-out-strong) both;
+  animation-delay: calc(var(--i, 0) * 90ms + 150ms);
+}
+
+/* ---------- Revelado al hacer scroll (efectos 2 y 3) ----------
+   Solo se ocultan cuando hay JS (clase .js en <html>), así el contenido nunca
+   queda invisible si el script falla. */
+
+.js [data-reveal] {
+  transition:
+    opacity 700ms var(--ease-out-strong),
+    transform 700ms var(--ease-out-strong),
+    clip-path 1100ms var(--ease-in-out-strong);
+  transition-delay: calc(var(--i, 0) * 60ms);
+}
+
+.js [data-reveal="up"]:not([data-revealed]) {
+  opacity: 0;
+  transform: translateY(12px);
+}
+
+.js [data-reveal="clip"]:not([data-revealed]) {
+  clip-path: inset(0 0 100% 0);
+}
+
+.js [data-reveal="clip"] {
+  clip-path: inset(0 0 0 0);
+}
+
+/* ---------- Hero ligado al scroll (efecto 1) ---------- */
+
+@supports (animation-timeline: scroll()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .hero-media {
+      animation: hero-zoom linear both;
+      animation-timeline: scroll(root);
+      animation-range: 0 100svh;
+    }
+    .hero-shade {
+      animation: hero-shade linear both;
+      animation-timeline: scroll(root);
+      animation-range: 0 100svh;
+    }
+    .hero-content {
+      animation: hero-content linear both;
+      animation-timeline: scroll(root);
+      animation-range: 0 70svh;
+    }
+  }
+}
+
+@keyframes hero-zoom {
+  from {
+    transform: scale(1.12);
+  }
+  to {
+    transform: scale(1);
+  }
+}
+
+@keyframes hero-shade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 0.55;
+  }
+}
+
+@keyframes hero-content {
+  to {
+    opacity: 0;
+    transform: translateY(-48px);
+  }
+}
+
+/* Movimiento reducido: sin desplazamientos, solo fundidos */
+@media (prefers-reduced-motion: reduce) {
+  .hero-in {
+    animation-name: fade-only;
+  }
+  .js [data-reveal="up"]:not([data-revealed]) {
+    transform: none;
+  }
+  .js [data-reveal="clip"]:not([data-revealed]) {
+    clip-path: inset(0 0 0 0);
+    opacity: 0;
+  }
+}
+
+@keyframes fade-only {
+  from {
+    opacity: 0;
   }
 }
