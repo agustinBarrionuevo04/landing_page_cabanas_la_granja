@@ -13,7 +13,9 @@ cabanas-la-granja/
                   gallery-section, location-section, contact-section, footer, floating-buttons)
                   + section-heading.tsx y reveal-observer.tsx (revelado al hacer scroll)
   components/ui/  componentes shadcn/ui (la mayoría sin uso)
-  lib/site.ts     datos de contacto, links de navegación y helper `whatsappUrl` (única fuente de verdad)
+  lib/site.ts     datos del negocio (dominio, dirección, contacto, servicios), links de navegación y `whatsappUrl` (única fuente de verdad)
+  lib/structured-data.ts  `lodgingBusinessJsonLd()`: JSON-LD del complejo, se inserta en `app/layout.tsx`
+  app/robots.ts, app/sitemap.ts  generan robots.txt y sitemap.xml en el build
   public/         fotos y logos
   test/           tests de Vitest + Testing Library
 plans/            planes de trabajo (`/planear`)
@@ -55,10 +57,12 @@ Notas verificadas:
 - **Deploy**: Vercel, sitio estático con dominio propio. Un merge a `main` publica. No mergear ni desplegar sin confirmación explícita.
 - **Imágenes**: `images.unoptimized: true` se mantiene a propósito (sitio estático). No activar la optimización de Next sin consultarlo.
 - **Fotos de `public/`**: son fotos reales del complejo. No borrar ni reemplazar sin pedido explícito.
+- **SEO y dominio**: `site.url` en `lib/site.ts` es el dominio canónico fijo `https://www.xn--cabaaslagranja-tnb.com` (cabañaslagranja.com en punycode, con www porque el resto redirige ahí; se puede cambiar con `NEXT_PUBLIC_SITE_URL`). De ahí salen `metadataBase`, el canonical, robots, sitemap y el JSON-LD. No volver a `VERCEL_PROJECT_PRODUCTION_URL`: puede elegir el dominio sin www, que redirige.
+- **Datos del negocio**: la dirección tiene que ser idéntica a la de la ficha de Google Maps ("Av. Teresa M. de Ferrarini 1100", X5172). Si cambia algo del contacto, se cambia en `lib/site.ts` y se actualiza solo en la página y en el JSON-LD.
+- **Vista previa al compartir**: la imagen es `public/og-image.jpg` (1200×630, ~180 KB; WhatsApp falla con imágenes pesadas).
 - **WhatsApp**: el formulario de contacto no tiene backend; arma un link `wa.me` con el número de `lib/site.ts`.
 
 ## Pendientes conocidos
 
-- `metadataBase` sin configurar (Next avisa en el build); va con la etapa de SEO.
 - Sin CI, sin lint, tests solo de la galería.
 - `styles/globals.css` y la mayoría de `components/ui` no se usan.
