@@ -55,10 +55,10 @@ Notas verificadas:
 - **Deploy**: Vercel, sitio estático con dominio propio. Un merge a `main` publica. No mergear ni desplegar sin confirmación explícita.
 - **Imágenes**: `images.unoptimized: true` se mantiene a propósito (sitio estático). No activar la optimización de Next sin consultarlo.
 - **Fotos de `public/`**: son fotos reales del complejo. No borrar ni reemplazar sin pedido explícito.
+- **Vista previa al compartir**: `metadataBase` sale de `VERCEL_PROJECT_PRODUCTION_URL` (Vercel la completa en cada build) o de `NEXT_PUBLIC_SITE_URL` si se define. La imagen es `public/og-image.jpg` (1200×630, ~180 KB; WhatsApp falla con imágenes pesadas).
 - **WhatsApp**: el formulario de contacto no tiene backend; arma un link `wa.me` con el número de `lib/site.ts`.
 
 ## Pendientes conocidos
 
-- `metadataBase` sin configurar (Next avisa en el build); va con la etapa de SEO.
 - Sin CI, sin lint, tests solo de la galería.
 - `styles/globals.css` y la mayoría de `components/ui` no se usan.
