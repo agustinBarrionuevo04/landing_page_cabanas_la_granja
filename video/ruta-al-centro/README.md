@@ -42,7 +42,7 @@ node render.js anfiteatro
 | `centro`: Av. Edén y Pres. Arturo Illia | 1,5 km · 4 min | 1,3 km · 20 min |
 | `anfiteatro`: Anfiteatro de La Falda | 1,4 km · 4 min | 1,4 km · 19 min |
 | `hotel-eden`: Hotel Edén | 1,4 km · 5 min | 1,4 km · 22 min |
-| `cordoba`: Plaza San Martín (Córdoba) → complejo | 78 km · 1 h 15 min, por Autopista Punilla y RN 38, con peaje | — |
+| `cordoba`: Córdoba (Plaza San Martín) → complejo | 78 km · 1 h 15 min, por Autopista Punilla y RN 38, con peaje | — |
 | `aeropuerto`: Aeropuerto de Córdoba → complejo | 52 km · 55 min, por RP E53 y Camino del Cuadrado, con peaje | — |
 
 Desde el aeropuerto, Google elige el Camino del Cuadrado (cruza las Sierras Chicas por Río Ceballos y Salsipuedes): es más corto que dar la vuelta por Córdoba y la Autopista Punilla (80 km · 1 h 08 min). El peaje sale de Routes API (`extraComputations: TOLLS`); el monto no se muestra porque cambia seguido.
