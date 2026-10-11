@@ -48,6 +48,16 @@
   .pin.origin .label, .pin.origin .dot, .pin.origin .stem { background: var(--primary); }
   .pin.dest .label, .pin.dest .dot, .pin.dest .stem { background: var(--secondary); }
 
+  /* Referencias: más chicas y neutras para no competir con origen y destino */
+  .pin.ref .label { background: #fff; color: var(--fg); font-size: 13px; padding: 5px 10px; border-radius: 10px; }
+  .pin.ref .stem { background: var(--fg); height: 10px; opacity: .6; }
+  .pin.ref .dot { background: var(--fg); width: 12px; height: 12px; border-width: 3px; margin-bottom: -6px; }
+  .road { position: absolute; }
+  .road .chip { position: absolute; left: 0; top: 0; translate: -50% -50%; white-space: nowrap; display: flex; align-items: center; gap: 6px;
+    padding: 4px 10px 4px 5px; border-radius: 999px; background: #fff; font-weight: 700; font-size: 13px; color: var(--fg);
+    box-shadow: 0 3px 10px rgba(38,29,22,.22); }
+  .road .shield { display: grid; place-items: center; width: 24px; height: 20px; border-radius: 6px; background: var(--fg); color: #fff; font-size: 11px; }
+
   .car { position: absolute; width: 0; height: 0; }
   .car .halo { position: absolute; width: 44px; height: 44px; left: -22px; top: -22px; border-radius: 50%; background: rgba(173,72,40,.25); }
   .car .core { position: absolute; width: 22px; height: 22px; left: -11px; top: -11px; border-radius: 50%; background: var(--secondary);
@@ -72,12 +82,13 @@
 </div>
 
 <script>
-// La ruta llega desde route.json (generado por fetch-route.js) vía boot(); ver README.md
-let ROUTE, ENCODED, ORIGIN, DEST;
-const FPS = 30, DURATION = 14;
+// La ruta llega desde route.json (fetch-route.js) y las referencias desde landmarks.json, vía boot(); ver README.md
+let ROUTE, LANDMARKS, ENCODED, ORIGIN, DEST;
+const FPS = 30, DURATION = 15;
 
 // Línea de tiempo (segundos)
-const T = { drawStart: 1.4, drawEnd: 8.6, destPop: 8.4, zoomOutStart: 9.0, zoomOutEnd: 11.0, cardIn: 10.6 };
+const T = { drawStart: 1.4, drawEnd: 6.4, destPop: 6.2, zoomOutStart: 6.8, zoomOutEnd: 8.6,
+  highway: [8.4, 9.6], refsFrom: 9.2, refsStep: 0.4, cardIn: 10.8 };
 // Zooms enteros en las pausas: en mapas raster un zoom fraccionario escala los tiles y las etiquetas se ven borrosas
 const Z_FOLLOW = 16, Z_OVERVIEW = 15;
 
@@ -88,7 +99,7 @@ const easeInOut = t => t < .5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
 const easeOut = t => 1 - Math.pow(1 - t, 3);
 const easeOutBack = t => { const c1 = 1.5, c3 = c1 + 1; return 1 + c3 * Math.pow(t - 1, 3) + c1 * Math.pow(t - 1, 2); };
 
-let map, path, cum, total, done, rest, car, originPin, destPin, overviewCenter;
+let map, path, cum, total, done, rest, car, originPin, destPin, overviewCenter, refPins, highway, highwayChip;
 
 function decode(str) {
   // decodificador estándar de polilíneas de Google (precisión 1e5)
@@ -140,8 +151,16 @@ const makeOverlayClass = () => class DomOverlay extends google.maps.OverlayView 
 function makePin(cls, title, small) {
   const el = document.createElement('div');
   el.className = 'pin ' + cls;
-  el.innerHTML = `<div class="bubble"><div class="label">${title}<small>${small}</small></div><div class="stem"></div><div class="dot"></div></div>`;
+  el.innerHTML = `<div class="bubble"><div class="label">${title}${small ? `<small>${small}</small>` : ''}</div><div class="stem"></div><div class="dot"></div></div>`;
   return el;
+}
+// Prefijo de un trazado hasta la fracción f de su largo (para dibujarlo de a poco)
+function cumDist(pts) { const c = [0]; for (let i = 1; i < pts.length; i++) c.push(c[i - 1] + haversine(pts[i - 1], pts[i])); return c; }
+function partial(pts, c, f) {
+  const d = f * c[c.length - 1];
+  let i = 1; while (i < c.length - 1 && c[i] < d) i++;
+  const k = clamp((d - c[i - 1]) / ((c[i] - c[i - 1]) || 1));
+  return pts.slice(0, i).concat([{ lat: lerp(pts[i - 1].lat, pts[i].lat, k), lng: lerp(pts[i - 1].lng, pts[i].lng, k) }]);
 }
 
 // OverlayView solo existe una vez cargada la API
@@ -178,12 +197,21 @@ function setup() {
   const Ov = window.DomOverlayCls;
   originPin = new Ov(makePin('origin', 'Cabañas La Granja', ROUTE.origin.address), ORIGIN); originPin.setMap(map);
   destPin = new Ov(makePin('dest', ROUTE.destination.label, ROUTE.destination.sublabel), DEST); destPin.setMap(map);
+  // Referencias: ruta nacional (trazo que se dibuja + etiqueta) y lugares conocidos
+  highway = new google.maps.Polyline({ map, path: [], strokeColor: '#261d16', strokeOpacity: .55, strokeWeight: 7, zIndex: 0 });
+  highway.pts = LANDMARKS.highway.path; highway.cum = cumDist(highway.pts);
+  const chipEl = document.createElement('div'); chipEl.className = 'road';
+  chipEl.innerHTML = `<div class="chip"><span class="shield">38</span>${LANDMARKS.highway.label}</div>`;
+  highwayChip = new Ov(chipEl, LANDMARKS.highway.labelAt); highwayChip.setMap(map);
+  refPins = LANDMARKS.points.map(pt => { const o = new Ov(makePin('ref', pt.label), pt.latLng); o.setMap(map); return o; });
+
   const carEl = document.createElement('div'); carEl.className = 'car'; carEl.innerHTML = '<div class="halo"></div><div class="core"></div>';
   car = new Ov(carEl, ORIGIN); car.setMap(map);
 
-  const lats = path.map(p => p.lat), lngs = path.map(p => p.lng);
-  // Centro del plano general, corrido un poco hacia el sur para dejar lugar al título arriba y la tarjeta abajo
-  overviewCenter = { lat: (Math.min(...lats) + Math.max(...lats)) / 2 - 0.0012, lng: (Math.min(...lngs) + Math.max(...lngs)) / 2 + 0.0004 };
+  // Plano general: la ruta y los lugares de referencia, corrido hacia el sur para dejar lugar al título y a la tarjeta
+  const all = path.concat(LANDMARKS.points.map(p => p.latLng));
+  const lats = all.map(p => p.lat), lngs = all.map(p => p.lng);
+  overviewCenter = { lat: (Math.min(...lats) + Math.max(...lats)) / 2 - 0.0012, lng: (Math.min(...lngs) + Math.max(...lngs)) / 2 };
 }
 
 // Espera a que los tiles visibles estén descargados: cantidad de <img> estable y todas completas durante 300 ms
@@ -221,6 +249,16 @@ window.renderAt = async (t) => {
   originPin.el.style.scale = String(o); originPin.el.style.opacity = String(clamp(o * 2));
   const dp = easeOutBack(prog(t, T.destPop, T.destPop + .55));
   destPin.el.style.scale = String(dp); destPin.el.style.opacity = String(clamp(dp * 2));
+
+  // Referencias (aparecen en el plano general)
+  const hw = easeInOut(prog(t, ...T.highway));
+  highway.setPath(hw > 0 ? partial(highway.pts, highway.cum, hw) : []);
+  const hc = easeOutBack(prog(t, T.highway[0] + .5, T.highway[0] + 1));
+  highwayChip.el.style.scale = String(hc); highwayChip.el.style.opacity = String(clamp(hc * 2));
+  refPins.forEach((pin, k) => {
+    const a = T.refsFrom + k * T.refsStep, v = easeOutBack(prog(t, a, a + .5));
+    pin.el.style.scale = String(v); pin.el.style.opacity = String(clamp(v * 2));
+  });
 
   // Cámara: sigue al auto y al final se aleja al plano general
   const z = prog(t, T.zoomOutStart, T.zoomOutEnd), ze = easeInOut(z);
@@ -264,8 +302,8 @@ function fillCard() {
   $('dest-sub').textContent = sub.charAt(0).toLowerCase() + sub.slice(1);
 }
 
-window.boot = async (key, route) => {
-  ROUTE = route; ENCODED = route.drive.polyline; ORIGIN = route.origin.latLng; DEST = route.destination.latLng;
+window.boot = async (key, route, landmarks) => {
+  ROUTE = route; LANDMARKS = landmarks; ENCODED = route.drive.polyline; ORIGIN = route.origin.latLng; DEST = route.destination.latLng;
   fillCard();
   await new Promise((res, rej) => {
     window.__mapsReady = res;

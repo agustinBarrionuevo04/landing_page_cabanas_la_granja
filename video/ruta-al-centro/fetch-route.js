@@ -6,7 +6,8 @@ const path = require('path');
 const key = process.env.GOOGLE_MAPS_API_KEY;
 if (!key) { console.error('Falta GOOGLE_MAPS_API_KEY'); process.exit(1); }
 
-const [address = 'Av. Edén 400, La Falda, Córdoba', label = 'Av. Edén', sublabel = 'Centro de La Falda'] = process.argv.slice(2);
+// Default: la esquina de Av. Edén más cercana al complejo (Pres. Arturo Illia), donde arranca el centro
+const [address = 'Av. Edén y Pres. Arturo Illia, La Falda, Córdoba', label = 'Av. Edén', sublabel = 'Centro de La Falda'] = process.argv.slice(2);
 
 // Origen: lib/site.ts es la única fuente de verdad de los datos del negocio
 const site = fs.readFileSync(path.join(__dirname, '../../cabanas-la-granja/lib/site.ts'), 'utf8');

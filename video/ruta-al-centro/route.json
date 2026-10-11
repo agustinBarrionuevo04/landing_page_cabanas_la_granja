@@ -7,21 +7,21 @@
     }
   },
   "destination": {
-    "query": "Av. Edén 400, La Falda, Córdoba",
+    "query": "Av. Edén y Pres. Arturo Illia, La Falda, Córdoba",
     "label": "Av. Edén",
     "sublabel": "Centro de La Falda",
     "latLng": {
-      "lat": -31.0930606,
-      "lng": -64.4825958
+      "lat": -31.092638099999995,
+      "lng": -64.4779807
     }
   },
   "drive": {
-    "meters": 2240,
-    "seconds": 394,
-    "polyline": "fiy|DnhohKSI_@YQ@j@xLRxC`AjSl@bOXdFL\\kBvAeBzAc@l@kJ`IqB}AwAaAwEVuH\\kG\\SiFK{E"
+    "meters": 1497,
+    "seconds": 233,
+    "polyline": "fiy|DnhohKSI_@YQ@j@xLRxCl@`Me@@_Kv@EoBwBHyCRuBFuBP{Jb@iH`@"
   },
   "walk": {
-    "meters": 1706,
-    "seconds": 1480
+    "meters": 1316,
+    "seconds": 1214
   }
 }

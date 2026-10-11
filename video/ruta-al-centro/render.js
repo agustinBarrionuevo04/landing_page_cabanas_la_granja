@@ -10,6 +10,7 @@ const key = process.env.GOOGLE_MAPS_API_KEY;
 if (!key) { console.error('Falta GOOGLE_MAPS_API_KEY'); process.exit(1); }
 const [out = 'ruta-al-centro.mp4', times] = process.argv.slice(2);
 const route = JSON.parse(fs.readFileSync(path.join(__dirname, 'route.json'), 'utf8'));
+const landmarks = JSON.parse(fs.readFileSync(path.join(__dirname, 'landmarks.json'), 'utf8'));
 
 (async () => {
   const browser = await chromium.launch({ executablePath: process.env.CHROMIUM_PATH || undefined });
@@ -17,7 +18,7 @@ const route = JSON.parse(fs.readFileSync(path.join(__dirname, 'route.json'), 'ut
   const page = await browser.newPage({ viewport: { width: 540, height: 960 }, deviceScaleFactor: 2 });
   page.on('pageerror', e => console.error('pageerror:', e.message));
   await page.goto('file://' + path.join(__dirname, 'route.html'));
-  await page.evaluate(([k, r]) => window.boot(k, r), [key, route]);
+  await page.evaluate(([k, r, l]) => window.boot(k, r, l), [key, route, landmarks]);
   const { FPS, DURATION } = await page.evaluate(() => window.META);
 
   if (times) {

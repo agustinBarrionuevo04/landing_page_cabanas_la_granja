@@ -1,12 +1,13 @@
 # Video: ruta al centro
 
-Genera un video vertical (1080×1920, 30 fps, 14 s) sobre un mapa de Google Maps con el recorrido en auto desde el complejo hasta Av. Edén. Muestra la distancia y el tiempo en auto y el tiempo a pie. Pensado para Reels y Stories.
+Genera un video vertical (1080×1920, 30 fps, 15 s) sobre un mapa de Google Maps con el recorrido en auto desde el complejo hasta Av. Edén. Muestra la distancia y el tiempo en auto, el tiempo a pie y puntos de referencia: Ruta Nacional 38, Anfiteatro y Hotel Edén. Pensado para Reels y Stories.
 
 ## Cómo funciona
 
 1. `fetch-route.js` le pide la ruta a **Routes API** en modo auto y a pie y la guarda en `route.json`. Guarda la polilínea codificada, los metros, los segundos y el punto de destino geocodificado. El origen (coordenadas y dirección) sale de `cabanas-la-granja/lib/site.ts`.
-2. `route.html` dibuja el mapa con **Maps JavaScript API** y expone `renderAt(t)`, que deja la escena en el segundo `t` (cámara, línea, pines, textos) y espera a que carguen los tiles.
-3. `render.js` abre la página con Playwright, captura cuadro por cuadro y lo codifica con ffmpeg (H.264, `yuv420p`, `+faststart`). Como renderiza cuadro a cuadro y no graba en tiempo real, el video sale fluido aunque la red sea lenta.
+2. `landmarks.json` tiene los puntos de referencia (coordenadas verificadas a mano sobre el ícono del lugar en el mapa) y el trazado del tramo urbano de la RN 38 (Av. España), sacado de Routes API.
+3. `route.html` dibuja el mapa con **Maps JavaScript API** y expone `renderAt(t)`, que deja la escena en el segundo `t` (cámara, línea, pines, textos) y espera a que carguen los tiles.
+4. `render.js` abre la página con Playwright, captura cuadro por cuadro y lo codifica con ffmpeg (H.264, `yuv420p`, `+faststart`). Como renderiza cuadro a cuadro y no graba en tiempo real, el video sale fluido aunque la red sea lenta.
 
 ## Requisitos
 
@@ -19,7 +20,7 @@ Desde esta carpeta:
 
 ```sh
 # 1. Ruta (solo hace falta si cambia el origen o el destino)
-node fetch-route.js                                   # default: "Av. Edén 400, La Falda, Córdoba"
+node fetch-route.js                                   # default: "Av. Edén y Pres. Arturo Illia, La Falda, Córdoba"
 node fetch-route.js "Av. Edén 400, La Falda, Córdoba" "Av. Edén" "Centro de La Falda"
 
 # 2. Revisar algunos cuadros sueltos (genera prueba_<t>.png)
@@ -29,12 +30,25 @@ node render.js prueba 1,5,10,13.5
 node render.js ruta-al-centro.mp4
 ```
 
+## Destino
+
+El destino por defecto es la esquina de Av. Edén más cercana al complejo (Pres. Arturo Illia): ahí empieza el centro. Routes API devuelve la ruta más rápida en auto, respetando las calles de mano única. Comparación hecha con Routes API:
+
+| Destino | Auto | A pie |
+|---|---|---|
+| Av. Edén y Pres. Arturo Illia (default) | 1,5 km · 4 min | 1,3 km · 20 min |
+| Av. Edén y Jujuy | 1,6 km · 4 min | 1,5 km · 22 min |
+| Plaza San Martín | 1,7 km · 5 min | 1,6 km · 23 min |
+| Av. Edén 400 (primera versión) | 2,2 km · 7 min | 1,7 km · 25 min |
+
+Si cambiás el destino o el tiempo del video, actualizá también `site.downtown` en `cabanas-la-granja/lib/site.ts` (el texto que acompaña al video en la landing).
+
 ## Ajustes
 
 En `route.html`:
-- `T`: línea de tiempo en segundos (cuándo arranca y termina el recorrido, el alejamiento y la tarjeta). `DURATION` y `FPS` definen el largo.
+- `T`: línea de tiempo en segundos (recorrido, alejamiento, aparición de las referencias y la tarjeta). `DURATION` y `FPS` definen el largo.
 - `Z_FOLLOW` / `Z_OVERVIEW`: zoom mientras sigue al auto y en el plano general. Conviene usar valores enteros: en mapas raster un zoom fraccionario escala los tiles y las etiquetas se ven borrosas.
-- `overviewCenter`: centro del plano general, corrido para dejar lugar al título y a la tarjeta. Si cambiás el destino, revisalo junto con `Z_OVERVIEW` mirando el cuadro final.
+- `overviewCenter`: centro del plano general (encuadra la ruta y los puntos de `landmarks.json`), corrido para dejar lugar al título y a la tarjeta. Si cambiás el destino o las referencias, revisalo junto con `Z_OVERVIEW` mirando el cuadro final.
 - Los colores son los tokens de `app/globals.css` (crema, verde monte, terracota), convertidos de oklch a hex.
 
 ## Notas
