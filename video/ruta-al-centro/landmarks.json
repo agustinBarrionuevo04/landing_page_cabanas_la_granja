@@ -1,7 +1,16 @@
 {
-  "_comment": "Puntos de referencia del video. Coordenadas verificadas a mano sobre el mapa (ícono del lugar en Google Maps); el trazado de la RN 38 sale de Routes API, recortado al tramo urbano (Av. España).",
+  "_comment": "Puntos de referencia del video. Coordenadas verificadas a mano sobre el ícono del lugar en Google Maps; el trazado de la RN 38 sale de Routes API, recortado al tramo urbano (Av. España). El `id` coincide con la clave de destinations.json: el lugar que es destino no se repite como referencia.",
   "points": [
     {
+      "id": "centro",
+      "label": "Centro",
+      "latLng": {
+        "lat": -31.0926377,
+        "lng": -64.4779807
+      }
+    },
+    {
+      "id": "anfiteatro",
       "label": "Anfiteatro",
       "latLng": {
         "lat": -31.0985,
@@ -9,6 +18,7 @@
       }
     },
     {
+      "id": "hotel-eden",
       "label": "Hotel Edén",
       "latLng": {
         "lat": -31.0915,
@@ -19,8 +29,8 @@
   "highway": {
     "label": "Ruta Nacional 38",
     "labelAt": {
-      "lat": -31.10024,
-      "lng": -64.48349
+      "lat": -31.10311,
+      "lng": -64.48148
     },
     "path": [
       {

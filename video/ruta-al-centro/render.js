@@ -1,6 +1,7 @@
 // Renderiza route.html cuadro por cuadro con Chromium y lo codifica a MP4 con ffmpeg.
-// Uso: GOOGLE_MAPS_API_KEY=... node render.js [salida.mp4]
-//      GOOGLE_MAPS_API_KEY=... node render.js prueba 1,5,13.5   (solo PNGs de esos segundos, para revisar)
+// Uso: GOOGLE_MAPS_API_KEY=... node render.js <destino> [salida.mp4]
+//      GOOGLE_MAPS_API_KEY=... node render.js <destino> prueba 1,5,13.5   (solo PNGs de esos segundos, para revisar)
+// <destino> es una clave de destinations.json con su routes/<destino>.json ya generado (fetch-route.js)
 const fs = require('fs');
 const path = require('path');
 const { spawn } = require('child_process');
@@ -8,8 +9,10 @@ const { chromium } = require('playwright');
 
 const key = process.env.GOOGLE_MAPS_API_KEY;
 if (!key) { console.error('Falta GOOGLE_MAPS_API_KEY'); process.exit(1); }
-const [out = 'ruta-al-centro.mp4', times] = process.argv.slice(2);
-const route = JSON.parse(fs.readFileSync(path.join(__dirname, 'route.json'), 'utf8'));
+const [id, out = `ruta-${process.argv[2]}.mp4`, times] = process.argv.slice(2);
+const routeFile = path.join(__dirname, 'routes', `${id}.json`);
+if (!id || !fs.existsSync(routeFile)) { console.error(`Falta routes/${id}.json: corré antes node fetch-route.js ${id}`); process.exit(1); }
+const route = JSON.parse(fs.readFileSync(routeFile, 'utf8'));
 const landmarks = JSON.parse(fs.readFileSync(path.join(__dirname, 'landmarks.json'), 'utf8'));
 
 (async () => {

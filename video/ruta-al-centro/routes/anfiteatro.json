@@ -1,0 +1,35 @@
+{
+  "origin": {
+    "address": "Av. Teresa M. de Ferrarini 1100",
+    "latLng": {
+      "lat": -31.1005613,
+      "lng": -64.4724555
+    }
+  },
+  "destination": {
+    "id": "anfiteatro",
+    "query": {
+      "placeId": "ChIJX6ZWQPmCLZQRccv8YJI5-lg"
+    },
+    "title": [
+      "Cómo llegar",
+      "al Anfiteatro"
+    ],
+    "label": "Anfiteatro",
+    "sublabel": "La Falda",
+    "cardTo": "el Anfiteatro de La Falda",
+    "latLng": {
+      "lat": -31.098470400000004,
+      "lng": -64.4844469
+    }
+  },
+  "drive": {
+    "meters": 1417,
+    "seconds": 234,
+    "polyline": "fiy|DnhohKSI_@YQ@j@xLRxC`AjSl@bOXdFL\\kBvAeBzAc@l@gGhFm@gA"
+  },
+  "walk": {
+    "meters": 1417,
+    "seconds": 1117
+  }
+}

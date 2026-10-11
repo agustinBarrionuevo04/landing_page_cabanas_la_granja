@@ -7,11 +7,19 @@
     }
   },
   "destination": {
-    "query": "Av. Edén y Pres. Arturo Illia, La Falda, Córdoba",
+    "id": "centro",
+    "query": {
+      "address": "Av. Edén y Pres. Arturo Illia, La Falda, Córdoba"
+    },
+    "title": [
+      "Cómo llegar",
+      "al centro"
+    ],
     "label": "Av. Edén",
     "sublabel": "Centro de La Falda",
+    "cardTo": "Av. Edén, en el centro",
     "latLng": {
-      "lat": -31.092638099999995,
+      "lat": -31.092637699999997,
       "lng": -64.4779807
     }
   },

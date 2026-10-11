@@ -71,18 +71,18 @@
   <div class="logo"><img src="../../cabanas-la-granja/public/logo-mark.png" alt=""></div>
   <div>
     <div class="eyebrow">Cabañas La Granja</div>
-    <h1>Cómo llegar<br>al centro</h1>
+    <h1 id="title"></h1>
   </div>
 </div>
 <div id="live">0,0 km</div>
 <div id="card">
   <div class="row"><span class="big" id="drive-min"></span><span class="unit">min en auto</span><span class="sep"></span><span class="km" id="drive-km"></span></div>
   <div class="sub">o unos <span id="walk-min"></span> min caminando</div>
-  <div class="addr">Desde <b id="origin-addr"></b><br>hasta <b id="dest-label"></b>, <span id="dest-sub"></span></div>
+  <div class="addr">Desde <b id="origin-addr"></b><br>hasta <b id="dest-to"></b></div>
 </div>
 
 <script>
-// La ruta llega desde route.json (fetch-route.js) y las referencias desde landmarks.json, vía boot(); ver README.md
+// La ruta llega desde routes/<destino>.json (fetch-route.js) y las referencias desde landmarks.json, vía boot(); ver README.md
 let ROUTE, LANDMARKS, ENCODED, ORIGIN, DEST;
 const FPS = 30, DURATION = 15;
 
@@ -203,13 +203,14 @@ function setup() {
   const chipEl = document.createElement('div'); chipEl.className = 'road';
   chipEl.innerHTML = `<div class="chip"><span class="shield">38</span>${LANDMARKS.highway.label}</div>`;
   highwayChip = new Ov(chipEl, LANDMARKS.highway.labelAt); highwayChip.setMap(map);
-  refPins = LANDMARKS.points.map(pt => { const o = new Ov(makePin('ref', pt.label), pt.latLng); o.setMap(map); return o; });
+  // El destino no se repite como referencia
+  refPins = LANDMARKS.points.filter(pt => pt.id !== ROUTE.destination.id).map(pt => { const o = new Ov(makePin('ref', pt.label), pt.latLng); o.setMap(map); return o; });
 
   const carEl = document.createElement('div'); carEl.className = 'car'; carEl.innerHTML = '<div class="halo"></div><div class="core"></div>';
   car = new Ov(carEl, ORIGIN); car.setMap(map);
 
   // Plano general: la ruta y los lugares de referencia, corrido hacia el sur para dejar lugar al título y a la tarjeta
-  const all = path.concat(LANDMARKS.points.map(p => p.latLng));
+  const all = path.concat(LANDMARKS.points.filter(p => p.id !== ROUTE.destination.id).map(p => p.latLng));
   const lats = all.map(p => p.lat), lngs = all.map(p => p.lng);
   overviewCenter = { lat: (Math.min(...lats) + Math.max(...lats)) / 2 - 0.0012, lng: (Math.min(...lngs) + Math.max(...lngs)) / 2 };
 }
@@ -297,9 +298,9 @@ function fillCard() {
   $('drive-km').textContent = (ROUTE.drive.meters / 1000).toFixed(1).replace('.', ',') + ' km';
   $('walk-min').textContent = Math.round(ROUTE.walk.seconds / 60 / 5) * 5;   // a pie, redondeado a 5 min
   $('origin-addr').textContent = ROUTE.origin.address;
-  $('dest-label').textContent = ROUTE.destination.label;
-  const sub = ROUTE.destination.sublabel;
-  $('dest-sub').textContent = sub.charAt(0).toLowerCase() + sub.slice(1);
+  $('dest-to').textContent = ROUTE.destination.cardTo;
+  const [l1, l2] = ROUTE.destination.title;
+  $('title').replaceChildren(l1, document.createElement('br'), l2);
 }
 
 window.boot = async (key, route, landmarks) => {

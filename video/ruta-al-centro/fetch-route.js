@@ -1,13 +1,16 @@
-// Pide a Routes API la ruta en auto y a pie desde el complejo hasta el destino y la guarda en route.json.
-// Uso: GOOGLE_MAPS_API_KEY=... node fetch-route.js ["dirección destino"] ["etiqueta"] ["subetiqueta"]
+// Pide a Routes API la ruta en auto y a pie desde el complejo hasta un destino de destinations.json
+// y la guarda en routes/<destino>.json.
+// Uso: GOOGLE_MAPS_API_KEY=... node fetch-route.js <destino>      (centro | anfiteatro | hotel-eden)
 const fs = require('fs');
 const path = require('path');
 
 const key = process.env.GOOGLE_MAPS_API_KEY;
 if (!key) { console.error('Falta GOOGLE_MAPS_API_KEY'); process.exit(1); }
 
-// Default: la esquina de Av. Edén más cercana al complejo (Pres. Arturo Illia), donde arranca el centro
-const [address = 'Av. Edén y Pres. Arturo Illia, La Falda, Córdoba', label = 'Av. Edén', sublabel = 'Centro de La Falda'] = process.argv.slice(2);
+const destinations = JSON.parse(fs.readFileSync(path.join(__dirname, 'destinations.json'), 'utf8'));
+const id = process.argv[2];
+const dest = destinations[id];
+if (!dest) { console.error(`Destino desconocido. Opciones: ${Object.keys(destinations).join(', ')}`); process.exit(1); }
 
 // Origen: lib/site.ts es la única fuente de verdad de los datos del negocio
 const site = fs.readFileSync(path.join(__dirname, '../../cabanas-la-granja/lib/site.ts'), 'utf8');
@@ -26,7 +29,8 @@ async function route(travelMode) {
     },
     body: JSON.stringify({
       origin: { location: { latLng: { latitude: origin.lat, longitude: origin.lng } } },
-      destination: { address },
+      // { address } o { placeId }: con placeId Google calcula hasta el acceso real del lugar
+      destination: dest.query,
       travelMode,
       languageCode: 'es-419',
     }),
@@ -47,10 +51,11 @@ async function route(travelMode) {
   const [drive, walk] = await Promise.all([route('DRIVE'), route('WALK')]);
   const out = {
     origin: { address: street[1], latLng: origin },
-    destination: { query: address, label, sublabel, latLng: drive.end },
+    destination: { id, ...dest, latLng: drive.end },
     drive: { meters: drive.meters, seconds: drive.seconds, polyline: drive.polyline },
     walk: { meters: walk.meters, seconds: walk.seconds },
   };
-  fs.writeFileSync(path.join(__dirname, 'route.json'), JSON.stringify(out, null, 2) + '\n');
-  console.log(`route.json: auto ${drive.meters} m / ${drive.seconds} s · a pie ${walk.meters} m / ${walk.seconds} s`);
+  fs.mkdirSync(path.join(__dirname, 'routes'), { recursive: true });
+  fs.writeFileSync(path.join(__dirname, 'routes', `${id}.json`), JSON.stringify(out, null, 2) + '\n');
+  console.log(`routes/${id}.json: auto ${drive.meters} m / ${drive.seconds} s · a pie ${walk.meters} m / ${walk.seconds} s`);
 })().catch(e => { console.error(e.message); process.exit(1); });

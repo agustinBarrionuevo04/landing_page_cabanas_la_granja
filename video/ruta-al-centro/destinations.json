@@ -1,0 +1,23 @@
+{
+  "centro": {
+    "query": { "address": "Av. Edén y Pres. Arturo Illia, La Falda, Córdoba" },
+    "title": ["Cómo llegar", "al centro"],
+    "label": "Av. Edén",
+    "sublabel": "Centro de La Falda",
+    "cardTo": "Av. Edén, en el centro"
+  },
+  "anfiteatro": {
+    "query": { "placeId": "ChIJX6ZWQPmCLZQRccv8YJI5-lg" },
+    "title": ["Cómo llegar", "al Anfiteatro"],
+    "label": "Anfiteatro",
+    "sublabel": "La Falda",
+    "cardTo": "el Anfiteatro de La Falda"
+  },
+  "hotel-eden": {
+    "query": { "placeId": "ChIJad5T0U2ZMpQRXyKjTvditDY" },
+    "title": ["Cómo llegar", "al Hotel Edén"],
+    "label": "Hotel Edén",
+    "sublabel": "La Falda",
+    "cardTo": "el Hotel Edén"
+  }
+}
