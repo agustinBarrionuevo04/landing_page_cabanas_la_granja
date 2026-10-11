@@ -395,7 +395,7 @@ function invDriveFrac(f) {
 const fmtKm = m => (m >= 10000 ? Math.round(m / 1000) : (m / 1000).toFixed(1).replace('.', ',')) + ' km';
 function fmtDuration(s) {
   const min = Math.round(s / 60);
-  return min < 60 ? { big: String(min), unit: 'min en auto' } : { big: `${Math.floor(min / 60)} h ${min % 60}`, unit: 'min en auto' };
+  return min < 60 ? { big: String(min), unit: 'min en auto' } : { big: `${Math.floor(min / 60)} h ${String(min % 60).padStart(2, '0')}`, unit: 'min en auto' };
 }
 function fillCard() {
   const $ = id => document.getElementById(id);
