@@ -76,21 +76,28 @@
 </div>
 <div id="live">0,0 km</div>
 <div id="card">
-  <div class="row"><span class="big" id="drive-min"></span><span class="unit">min en auto</span><span class="sep"></span><span class="km" id="drive-km"></span></div>
-  <div class="sub">o unos <span id="walk-min"></span> min caminando</div>
-  <div class="addr">Desde <b id="origin-addr"></b><br>hasta <b id="dest-to"></b></div>
+  <div class="row"><span class="big" id="big"></span><span class="unit" id="unit"></span><span class="sep"></span><span class="km" id="drive-km"></span></div>
+  <div class="sub" id="sub"></div>
+  <div class="addr">Desde <b id="from"></b><br>hasta <b id="to"></b><span id="to-extra"></span></div>
 </div>
+
 
 <script>
 // La ruta llega desde routes/<destino>.json (fetch-route.js) y las referencias desde landmarks.json, vía boot(); ver README.md
-let ROUTE, LANDMARKS, ENCODED, ORIGIN, DEST;
-const FPS = 30, DURATION = 15;
+// Dos modos: "local" (del complejo a un lugar de La Falda) y "viaje" (trip: de Córdoba o el aeropuerto al complejo)
+let ROUTE, LANDMARKS, TRIP, ENCODED;
+const FPS = 30;
+let DURATION;
 
-// Línea de tiempo (segundos)
-const T = { drawStart: 1.4, drawEnd: 6.4, destPop: 6.2, zoomOutStart: 6.8, zoomOutEnd: 8.6,
+// Líneas de tiempo (segundos)
+const T_LOCAL = { duration: 15, drawStart: 1.4, drawEnd: 6.4, endPop: 6.2, zoomOutStart: 6.8, zoomOutEnd: 8.6,
   highway: [8.4, 9.6], refsFrom: 9.2, refsStep: 0.4, cardIn: 10.8 };
+const T_TRIP = { duration: 20, zoomOutStart: 1.0, zoomOutEnd: 2.8, drawStart: 2.4, drawEnd: 11.5,
+  zoomInStart: 11.5, zoomInEnd: 14.0, endPop: 13.6, refsFrom: 14.2, refsStep: 0.3, cardIn: 15.2 };
+let T;
 // Zooms enteros en las pausas: en mapas raster un zoom fraccionario escala los tiles y las etiquetas se ven borrosas
-const Z_FOLLOW = 16, Z_OVERVIEW = 15;
+const Z_FOLLOW = 16, Z_OVERVIEW = 15;          // local
+const Z_TRIP_START = 12, Z_TRIP_END = 15;      // viaje: arranque en la ciudad y llegada a La Falda; el plano regional se calcula
 
 const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
 const lerp = (a, b, t) => a + (b - a) * t;
@@ -98,8 +105,10 @@ const prog = (t, a, b) => clamp((t - a) / (b - a));
 const easeInOut = t => t < .5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;   // cubic
 const easeOut = t => 1 - Math.pow(1 - t, 3);
 const easeOutBack = t => { const c1 = 1.5, c3 = c1 + 1; return 1 + c3 * Math.pow(t - 1, 3) + c1 * Math.pow(t - 1, 2); };
+const pop = (el, v) => { el.style.scale = String(v); el.style.opacity = String(clamp(v * 2)); };
 
-let map, path, cum, total, done, rest, car, originPin, destPin, overviewCenter, refPins, highway, highwayChip;
+let map, path, cum, total, done, car, startPin, endPin, refPins = [], highway, highwayChip;
+let overviewCenter, zOverview, finalCenter, tripMarks = [];
 
 function decode(str) {
   // decodificador estándar de polilíneas de Google (precisión 1e5)
@@ -121,16 +130,27 @@ function haversine(a, b) {
   const h = Math.sin(dLat / 2) ** 2 + Math.cos(a.lat * r) * Math.cos(b.lat * r) * Math.sin(dLng / 2) ** 2;
   return 2 * R * Math.asin(Math.sqrt(h));
 }
-// Punto a distancia d (m) sobre la ruta + cuántos vértices quedaron atrás
-function along(d) {
-  d = clamp(d, 0, total);
-  let i = 1; while (i < cum.length - 1 && cum[i] < d) i++;
-  const f = (d - cum[i - 1]) / ((cum[i] - cum[i - 1]) || 1);
-  return { p: { lat: lerp(path[i - 1].lat, path[i].lat, f), lng: lerp(path[i - 1].lng, path[i].lng, f) }, i };
+function cumDist(pts) { const c = [0]; for (let i = 1; i < pts.length; i++) c.push(c[i - 1] + haversine(pts[i - 1], pts[i])); return c; }
+// Punto a distancia d (m) sobre un trazado + cuántos vértices quedaron atrás
+function alongPts(pts, c, d) {
+  d = clamp(d, 0, c[c.length - 1]);
+  let i = 1; while (i < c.length - 1 && c[i] < d) i++;
+  const f = clamp((d - c[i - 1]) / ((c[i] - c[i - 1]) || 1));
+  return { p: { lat: lerp(pts[i - 1].lat, pts[i].lat, f), lng: lerp(pts[i - 1].lng, pts[i].lng, f) }, i };
 }
+const along = d => alongPts(path, cum, d);
+// Prefijo de un trazado hasta la fracción f de su largo (para dibujarlo de a poco)
+function partial(pts, c, f) { const { p, i } = alongPts(pts, c, f * c[c.length - 1]); return pts.slice(0, i).concat([p]); }
+// Distancia sobre la ruta del vértice más cercano a q (para saber cuándo pasa el auto)
+function nearestOnRoute(q) {
+  let best = 0, bd = Infinity;
+  path.forEach((p, i) => { const d = haversine(p, q); if (d < bd) { bd = d; best = i; } });
+  return { d: cum[best], p: path[best] };
+}
+
 // Fracción de distancia recorrida en el tiempo t
 const driveFrac = t => easeInOut(prog(t, T.drawStart, T.drawEnd));
-// Cámara de seguimiento: promedio móvil de la posición del auto (±0.8 s) para que no dé tirones en las curvas
+// Cámara de seguimiento (local): promedio móvil de la posición del auto (±0.8 s) para que no dé tirones en las curvas
 function followCenter(t) {
   let lat = 0, lng = 0, n = 0;
   for (let k = -12; k <= 12; k++) {
@@ -138,6 +158,14 @@ function followCenter(t) {
   }
   return { lat: lat / n, lng: lng / n };
 }
+// Transición de cámara entre (c0, z0) y (c1, z1): el punto c1 se desplaza en pantalla de forma lineal
+// mientras el zoom cambia, así no "patina" al acercarse o alejarse
+function zoomMove(c0, z0, c1, z1, e) {
+  const z = lerp(z0, z1, e), k = (1 - e) * Math.pow(2, z0 - z);
+  return { center: { lat: c1.lat - (c1.lat - c0.lat) * k, lng: c1.lng - (c1.lng - c0.lng) * k }, zoom: z };
+}
+// Grados por píxel CSS a un zoom dado (aprox. local, alcanza para encuadrar)
+const degPerPx = (z, lat) => { const lng = 360 / (256 * Math.pow(2, z)); return { lng, lat: lng * Math.cos(lat * Math.PI / 180) }; };
 
 const makeOverlayClass = () => class DomOverlay extends google.maps.OverlayView {
   constructor(el, pos) { super(); this.el = el; this.pos = pos; }
@@ -154,13 +182,10 @@ function makePin(cls, title, small) {
   el.innerHTML = `<div class="bubble"><div class="label">${title}${small ? `<small>${small}</small>` : ''}</div><div class="stem"></div><div class="dot"></div></div>`;
   return el;
 }
-// Prefijo de un trazado hasta la fracción f de su largo (para dibujarlo de a poco)
-function cumDist(pts) { const c = [0]; for (let i = 1; i < pts.length; i++) c.push(c[i - 1] + haversine(pts[i - 1], pts[i])); return c; }
-function partial(pts, c, f) {
-  const d = f * c[c.length - 1];
-  let i = 1; while (i < c.length - 1 && c[i] < d) i++;
-  const k = clamp((d - c[i - 1]) / ((c[i] - c[i - 1]) || 1));
-  return pts.slice(0, i).concat([{ lat: lerp(pts[i - 1].lat, pts[i].lat, k), lng: lerp(pts[i - 1].lng, pts[i].lng, k) }]);
+function makeRoadChip(label, shield) {
+  const el = document.createElement('div'); el.className = 'road';
+  el.innerHTML = `<div class="chip">${shield ? `<span class="shield">${shield}</span>` : ''}${label}</div>`;
+  return el;
 }
 
 // OverlayView solo existe una vez cargada la API
@@ -168,13 +193,19 @@ window.initMap = () => { window.DomOverlayCls = makeOverlayClass(); };
 
 function setup() {
   path = decode(ENCODED);
-  cum = [0]; for (let i = 1; i < path.length; i++) cum.push(cum[i - 1] + haversine(path[i - 1], path[i]));
+  cum = cumDist(path);
   total = cum[cum.length - 1];
+  const START = path[0], END = path[path.length - 1];
 
   map = new google.maps.Map(document.getElementById('map'), {
-    center: ORIGIN, zoom: Z_FOLLOW, disableDefaultUI: true, keyboardShortcuts: false, gestureHandling: 'none',
+    center: START, zoom: TRIP ? Z_TRIP_START : Z_FOLLOW, disableDefaultUI: true, keyboardShortcuts: false, gestureHandling: 'none',
     isFractionalZoomEnabled: true, clickableIcons: false,
-    styles: [
+    // En los viajes, relieve: se ven las sierras y el valle de Punilla
+    mapTypeId: TRIP ? 'terrain' : 'roadmap',
+    styles: TRIP ? [
+      { featureType: 'poi', stylers: [{ visibility: 'off' }] },
+      { featureType: 'transit', stylers: [{ visibility: 'off' }] },
+    ] : [
       { featureType: 'poi', elementType: 'labels.icon', stylers: [{ visibility: 'off' }] },
       { featureType: 'poi.business', stylers: [{ visibility: 'off' }] },
       { featureType: 'poi.park', elementType: 'geometry', stylers: [{ color: '#d9e6cf' }] },
@@ -188,31 +219,67 @@ function setup() {
   });
 
   // Ruta completa tenue (anticipa el recorrido) + tramo recorrido con borde blanco
-  rest = new google.maps.Polyline({ map, path, strokeColor: '#2d4b2e', strokeOpacity: 0, zIndex: 1,
+  new google.maps.Polyline({ map, path, strokeColor: '#2d4b2e', strokeOpacity: 0, zIndex: 1,
     icons: [{ icon: { path: 'M 0,-1 0,1', strokeOpacity: .45, strokeColor: '#2d4b2e', scale: 3 }, offset: '0', repeat: '14px' }] });
   const casing = new google.maps.Polyline({ map, path: [], strokeColor: '#ffffff', strokeWeight: 11, strokeOpacity: 1, zIndex: 2 });
   done = new google.maps.Polyline({ map, path: [], strokeColor: '#2d4b2e', strokeWeight: 6.5, strokeOpacity: 1, zIndex: 3 });
   done.casing = casing;
 
   const Ov = window.DomOverlayCls;
-  originPin = new Ov(makePin('origin', 'Cabañas La Granja', ROUTE.origin.address), ORIGIN); originPin.setMap(map);
-  destPin = new Ov(makePin('dest', ROUTE.destination.label, ROUTE.destination.sublabel), DEST); destPin.setMap(map);
-  // Referencias: ruta nacional (trazo que se dibuja + etiqueta) y lugares conocidos
-  highway = new google.maps.Polyline({ map, path: [], strokeColor: '#261d16', strokeOpacity: .55, strokeWeight: 7, zIndex: 0 });
-  highway.pts = LANDMARKS.highway.path; highway.cum = cumDist(highway.pts);
-  const chipEl = document.createElement('div'); chipEl.className = 'road';
-  chipEl.innerHTML = `<div class="chip"><span class="shield">38</span>${LANDMARKS.highway.label}</div>`;
-  highwayChip = new Ov(chipEl, LANDMARKS.highway.labelAt); highwayChip.setMap(map);
-  // El destino no se repite como referencia
-  refPins = LANDMARKS.points.filter(pt => pt.id !== ROUTE.destination.id).map(pt => { const o = new Ov(makePin('ref', pt.label), pt.latLng); o.setMap(map); return o; });
+  // El complejo siempre en verde; el otro extremo en terracota
+  const complexPin = () => makePin('origin', 'Cabañas La Granja', ROUTE.origin.address);
+  const placePin = () => makePin('dest', ROUTE.destination.label, ROUTE.destination.sublabel);
+  startPin = new Ov(TRIP ? placePin() : complexPin(), START); startPin.setMap(map);
+  endPin = new Ov(TRIP ? complexPin() : placePin(), END); endPin.setMap(map);
+
+  // Referencias de La Falda (en un viaje aparecen al llegar; el destino local no se repite)
+  const localRefs = LANDMARKS.points.filter(pt => pt.id !== ROUTE.destination.id);
+  refPins = localRefs.map(pt => { const o = new Ov(makePin('ref', pt.label), pt.latLng); o.setMap(map); return o; });
+
+  if (TRIP) {
+    // Localidades y rutas del camino: aparecen cuando el auto pasa cerca
+    for (const w of ROUTE.destination.waypoints || []) {
+      const o = new Ov(makePin('ref', w.label), w.latLng); o.setMap(map);
+      tripMarks.push({ ov: o, d: nearestOnRoute(w.latLng).d });
+    }
+    for (const r of ROUTE.destination.roads || []) {
+      const n = nearestOnRoute(r.near);   // la etiqueta va sobre la línea de la ruta
+      const o = new Ov(makeRoadChip(r.label, r.shield), n.p); o.setMap(map);
+      tripMarks.push({ ov: o, d: n.d });
+    }
+
+    // Plano regional: el zoom entero más grande en el que entra toda la ruta, dejando lugar al título y al contador
+    const lats = path.map(p => p.lat), lngs = path.map(p => p.lng);
+    const box = { w: 440, h: 600 };   // px CSS disponibles (entre el contador y el pie con el logo de Google)
+    const midLat = (Math.min(...lats) + Math.max(...lats)) / 2;
+    zOverview = 18;
+    while (zOverview > 3) {
+      const g = degPerPx(zOverview, midLat);
+      if ((Math.max(...lngs) - Math.min(...lngs)) / g.lng <= box.w && (Math.max(...lats) - Math.min(...lats)) / g.lat <= box.h) break;
+      zOverview--;
+    }
+    // El área libre está centrada ~40 px por debajo del centro de la pantalla (debajo del título y el contador): corro el centro hacia el norte
+    const g = degPerPx(zOverview, midLat);
+    overviewCenter = { lat: midLat + 40 * g.lat, lng: (Math.min(...lngs) + Math.max(...lngs)) / 2 };
+
+    // Llegada: encuadre del complejo y las referencias de La Falda, corrido hacia el sur por la tarjeta
+    const fl = [END, ...localRefs.map(p => p.latLng)];
+    finalCenter = { lat: (Math.min(...fl.map(p => p.lat)) + Math.max(...fl.map(p => p.lat))) / 2 - 0.0012,
+      lng: (Math.min(...fl.map(p => p.lng)) + Math.max(...fl.map(p => p.lng))) / 2 };
+  } else {
+    // Ruta nacional (trazo que se dibuja + etiqueta)
+    highway = new google.maps.Polyline({ map, path: [], strokeColor: '#261d16', strokeOpacity: .55, strokeWeight: 7, zIndex: 0 });
+    highway.pts = LANDMARKS.highway.path; highway.cum = cumDist(highway.pts);
+    highwayChip = new Ov(makeRoadChip(LANDMARKS.highway.label, '38'), LANDMARKS.highway.labelAt); highwayChip.setMap(map);
+
+    // Plano general: la ruta y los lugares de referencia, corrido hacia el sur para dejar lugar al título y a la tarjeta
+    const all = path.concat(localRefs.map(p => p.latLng));
+    const lats = all.map(p => p.lat), lngs = all.map(p => p.lng);
+    overviewCenter = { lat: (Math.min(...lats) + Math.max(...lats)) / 2 - 0.0012, lng: (Math.min(...lngs) + Math.max(...lngs)) / 2 };
+  }
 
   const carEl = document.createElement('div'); carEl.className = 'car'; carEl.innerHTML = '<div class="halo"></div><div class="core"></div>';
-  car = new Ov(carEl, ORIGIN); car.setMap(map);
-
-  // Plano general: la ruta y los lugares de referencia, corrido hacia el sur para dejar lugar al título y a la tarjeta
-  const all = path.concat(LANDMARKS.points.filter(p => p.id !== ROUTE.destination.id).map(p => p.latLng));
-  const lats = all.map(p => p.lat), lngs = all.map(p => p.lng);
-  overviewCenter = { lat: (Math.min(...lats) + Math.max(...lats)) / 2 - 0.0012, lng: (Math.min(...lngs) + Math.max(...lngs)) / 2 };
+  car = new Ov(carEl, START); car.setMap(map);
 }
 
 // Espera a que los tiles visibles estén descargados: cantidad de <img> estable y todas completas durante 300 ms
@@ -231,7 +298,25 @@ function waitTiles(timeout = 8000) {
   });
 }
 
-let lastCam = '';
+function cameraLocal(t) {
+  const ze = easeInOut(prog(t, T.zoomOutStart, T.zoomOutEnd));
+  const f = followCenter(Math.min(t, T.zoomOutStart));
+  return {
+    center: { lat: lerp(f.lat, overviewCenter.lat, ze), lng: lerp(f.lng, overviewCenter.lng, ze) },
+    zoom: lerp(lerp(Z_FOLLOW - .3, Z_FOLLOW, easeInOut(prog(t, 0, T.drawStart + 1))), Z_OVERVIEW, ze),
+  };
+}
+// Viaje en tres actos: ciudad de partida → plano regional mientras avanza el auto → llegada a La Falda
+function cameraTrip(t) {
+  if (t < T.zoomInStart) {
+    const e = easeInOut(prog(t, T.zoomOutStart, T.zoomOutEnd));
+    return zoomMove(path[0], Z_TRIP_START, overviewCenter, zOverview, e);
+  }
+  const e = easeInOut(prog(t, T.zoomInStart, T.zoomInEnd));
+  return zoomMove(overviewCenter, zOverview, finalCenter, Z_TRIP_END, e);
+}
+
+let lastCam = '', lastZoom = null, lastCenter = null;
 window.renderAt = async (t) => {
   const d = driveFrac(t) * total;
   const { p, i } = along(d);
@@ -245,32 +330,41 @@ window.renderAt = async (t) => {
   car.el.querySelector('.halo').style.scale = String(1 + pulse * .5);
   car.el.querySelector('.halo').style.opacity = String(1 - pulse * .6);
 
-  // Pines
-  const o = easeOutBack(prog(t, 0.3, 0.9));
-  originPin.el.style.scale = String(o); originPin.el.style.opacity = String(clamp(o * 2));
-  const dp = easeOutBack(prog(t, T.destPop, T.destPop + .55));
-  destPin.el.style.scale = String(dp); destPin.el.style.opacity = String(clamp(dp * 2));
+  // Pines de los extremos
+  pop(startPin.el, easeOutBack(prog(t, 0.3, 0.9)));
+  pop(endPin.el, easeOutBack(prog(t, T.endPop, T.endPop + .55)));
 
-  // Referencias (aparecen en el plano general)
-  const hw = easeInOut(prog(t, ...T.highway));
-  highway.setPath(hw > 0 ? partial(highway.pts, highway.cum, hw) : []);
-  const hc = easeOutBack(prog(t, T.highway[0] + .5, T.highway[0] + 1));
-  highwayChip.el.style.scale = String(hc); highwayChip.el.style.opacity = String(clamp(hc * 2));
-  refPins.forEach((pin, k) => {
-    const a = T.refsFrom + k * T.refsStep, v = easeOutBack(prog(t, a, a + .5));
-    pin.el.style.scale = String(v); pin.el.style.opacity = String(clamp(v * 2));
-  });
+  // Referencias
+  refPins.forEach((pin, k) => { const a = T.refsFrom + k * T.refsStep; pop(pin.el, easeOutBack(prog(t, a, a + .5))); });
+  if (TRIP) {
+    // aparecen cuando pasa el auto y se van al acercarse a La Falda (a ese zoom quedarían fuera de cuadro o encimadas)
+    const out = 1 - prog(t, T.zoomInStart, T.zoomInStart + .5);
+    for (const m of tripMarks) {
+      const ta = T.drawStart + (T.drawEnd - T.drawStart) * invDriveFrac(m.d / total);
+      pop(m.ov.el, easeOutBack(prog(t, ta - .2, ta + .3)) * out);
+    }
+  } else {
+    const hw = easeInOut(prog(t, ...T.highway));
+    highway.setPath(hw > 0 ? partial(highway.pts, highway.cum, hw) : []);
+    pop(highwayChip.el, easeOutBack(prog(t, T.highway[0] + .5, T.highway[0] + 1)));
+  }
 
-  // Cámara: sigue al auto y al final se aleja al plano general
-  const z = prog(t, T.zoomOutStart, T.zoomOutEnd), ze = easeInOut(z);
-  const f = followCenter(Math.min(t, T.zoomOutStart));
-  const center = { lat: lerp(f.lat, overviewCenter.lat, ze), lng: lerp(f.lng, overviewCenter.lng, ze) };
-  const zoom = lerp(lerp(Z_FOLLOW - .3, Z_FOLLOW, easeInOut(prog(t, 0, T.drawStart + 1))), Z_OVERVIEW, ze);
+  // Cámara
+  const { center, zoom } = TRIP ? cameraTrip(t) : cameraLocal(t);
   const cam = center.lat.toFixed(8) + center.lng.toFixed(8) + zoom.toFixed(4);
   let idle = Promise.resolve(), changed = cam !== lastCam;
-  if (cam !== lastCam) {
+  if (changed) {
+    // Si cambia el nivel de tiles o la cámara salta lejos, Google pide tiles nuevos recién después de 'idle':
+    // ahí espero también 'tilesloaded' para no capturar tiles viejos escalados o huecos
+    const g = degPerPx(zoom, center.lat);
+    const jump = lastZoom === null || Math.round(zoom) !== Math.round(lastZoom) ||
+      Math.abs(center.lng - lastCenter.lng) / g.lng > 120 || Math.abs(center.lat - lastCenter.lat) / g.lat > 120;
     idle = new Promise(r => { google.maps.event.addListenerOnce(map, 'idle', r); setTimeout(r, 4000); });
-    map.moveCamera({ center, zoom }); lastCam = cam;
+    if (jump) {
+      const loaded = new Promise(r => { google.maps.event.addListenerOnce(map, 'tilesloaded', r); setTimeout(r, 3000); });
+      idle = Promise.all([idle, loaded]);
+    }
+    map.moveCamera({ center, zoom }); lastCam = cam; lastZoom = zoom; lastCenter = center;
   }
 
   // Textos
@@ -282,7 +376,7 @@ window.renderAt = async (t) => {
   const live = document.getElementById('live');
   const lv = easeOut(prog(t, T.drawStart - .4, T.drawStart)) * (1 - prog(t, T.cardIn - .4, T.cardIn));
   live.style.opacity = lv; live.style.translate = `0 ${(1 - easeOut(prog(t, T.drawStart - .4, T.drawStart))) * 10}px`;
-  live.textContent = (d / 1000).toFixed(1).replace('.', ',') + ' km';
+  live.textContent = TRIP ? Math.round(d / 1000) + ' km' : (d / 1000).toFixed(1).replace('.', ',') + ' km';
 
   const c = easeOut(prog(t, T.cardIn, T.cardIn + .6));
   const card = document.getElementById('card');
@@ -291,20 +385,41 @@ window.renderAt = async (t) => {
   await idle;
   if (changed) await waitTiles();
 };
+// Inversa de easeInOut (bisección): en qué momento del recorrido el auto llega a una fracción de distancia
+function invDriveFrac(f) {
+  let a = 0, b = 1;
+  for (let k = 0; k < 30; k++) { const m = (a + b) / 2; if (easeInOut(m) < f) a = m; else b = m; }
+  return (a + b) / 2;
+}
 
+const fmtKm = m => (m >= 10000 ? Math.round(m / 1000) : (m / 1000).toFixed(1).replace('.', ',')) + ' km';
+function fmtDuration(s) {
+  const min = Math.round(s / 60);
+  return min < 60 ? { big: String(min), unit: 'min en auto' } : { big: `${Math.floor(min / 60)} h ${min % 60}`, unit: 'min en auto' };
+}
 function fillCard() {
   const $ = id => document.getElementById(id);
-  $('drive-min').textContent = Math.round(ROUTE.drive.seconds / 60);
-  $('drive-km').textContent = (ROUTE.drive.meters / 1000).toFixed(1).replace('.', ',') + ' km';
-  $('walk-min').textContent = Math.round(ROUTE.walk.seconds / 60 / 5) * 5;   // a pie, redondeado a 5 min
-  $('origin-addr').textContent = ROUTE.origin.address;
-  $('dest-to').textContent = ROUTE.destination.cardTo;
-  const [l1, l2] = ROUTE.destination.title;
+  const dest = ROUTE.destination, dur = fmtDuration(ROUTE.drive.seconds);
+  $('big').textContent = dur.big;
+  $('unit').textContent = dur.unit;
+  $('drive-km').textContent = fmtKm(ROUTE.drive.meters);
+  if (TRIP) {
+    $('sub').textContent = dest.via;
+    $('from').textContent = dest.cardFrom;
+    $('to').textContent = ROUTE.origin.address;
+    $('to-extra').textContent = ', La Falda';
+  } else {
+    $('sub').textContent = `o unos ${Math.round(ROUTE.walk.seconds / 60 / 5) * 5} min caminando`;   // a pie, redondeado a 5 min
+    $('from').textContent = ROUTE.origin.address;
+    $('to').textContent = dest.cardTo;
+  }
+  const [l1, l2] = dest.title;
   $('title').replaceChildren(l1, document.createElement('br'), l2);
 }
 
 window.boot = async (key, route, landmarks) => {
-  ROUTE = route; LANDMARKS = landmarks; ENCODED = route.drive.polyline; ORIGIN = route.origin.latLng; DEST = route.destination.latLng;
+  ROUTE = route; LANDMARKS = landmarks; TRIP = !!route.destination.trip; ENCODED = route.drive.polyline;
+  T = TRIP ? T_TRIP : T_LOCAL; DURATION = T.duration;
   fillCard();
   await new Promise((res, rej) => {
     window.__mapsReady = res;

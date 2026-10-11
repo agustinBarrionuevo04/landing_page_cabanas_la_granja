@@ -1,0 +1,66 @@
+{
+  "origin": {
+    "address": "Av. Teresa M. de Ferrarini 1100",
+    "latLng": {
+      "lat": -31.1005613,
+      "lng": -64.4724555
+    }
+  },
+  "destination": {
+    "id": "cordoba",
+    "trip": true,
+    "query": {
+      "placeId": "ChIJry8L6wKZMpQRgunGjUe7gkM"
+    },
+    "title": [
+      "Desde Córdoba",
+      "hasta las cabañas"
+    ],
+    "label": "Córdoba",
+    "sublabel": "Plaza San Martín",
+    "cardFrom": "el centro de Córdoba",
+    "via": "por Autopista Punilla y RN 38 · con peaje",
+    "waypoints": [
+      {
+        "label": "Villa Carlos Paz",
+        "latLng": {
+          "lat": -31.4241,
+          "lng": -64.4978
+        }
+      },
+      {
+        "label": "Cosquín",
+        "latLng": {
+          "lat": -31.245,
+          "lng": -64.4656
+        }
+      }
+    ],
+    "roads": [
+      {
+        "label": "Autopista Punilla",
+        "near": {
+          "lat": -31.33,
+          "lng": -64.455
+        }
+      },
+      {
+        "label": "Ruta Nacional 38",
+        "shield": "38",
+        "near": {
+          "lat": -31.17,
+          "lng": -64.475
+        }
+      }
+    ],
+    "latLng": {
+      "lat": -31.4172984,
+      "lng": -64.1837365
+    }
+  },
+  "drive": {
+    "meters": 77830,
+    "seconds": 4492,
+    "polyline": "bew~Dj{vfKgElTfF`BRP~JbDbA\\Z^v@Td@@fG`BlC|@xLpD^PnInCbP`F~L~DbBd@lBt@Af@Jh@T`@TRb@Jd@A`@QNOHQ~@GvB~@pG~AvNzCbFnAbMjCzL`CxMbD~NjDrA`@fCj@t@RZVT`@P\\H^PLZ@VMJSr@OV@zCb@jPvBv@Ff@G~Cu@xCm@l@?\\B|N`CzNdClBd@DTNNT@RK^?|AVd@`@RZJZNxALf@Ph@`BbD`@nAZ~AHp@@rAAtCA\\FP_@xGc@~FyCrd@g@rHyA~R{@vN[tDaAtN[rDWxDuC|]}@fJwA~O[dDuAhP}@hJi@vHq@`G]tBYbAcA|Ck@xAaAjB}@vAuAjBuA`BuChCo@d@sC~A}CjA_Cn@mC\\sZb@cD?kLBsQ?eCJkEf@iDt@_AXaBp@cD|AyA~@qCbCgAjAqCjDmHlJ}F`I_BtBkDpEiBfCIFKBsDxFoAbCO\\wAfFQbAe@lDKfBK\\GXWlEa@pCc@lBo@fBe@bA}@`BeBnCgAtB}@bCk@pBSfAQhBM|C?bAF|BRzBT`Bj@~BRr@^`AfAvB^l@~@fAtAxALTlBzAvBfBtB`BnF~En@`@fAbBfBbC|AjCd@~@rAfDn@vB|@~DTlAd@nDV~DVnIjAdd@d@~TjBjr@DfIJbDZdHTnJVlILdIbAv_@L|C|@zNTxG\\bNh@jUn@fVXjMD|B`@xLRlJjBzp@LvHvDnwABt@n@tG`@jCf@rCnAlEdAtCv@rB|A`DtAzBxEvIrCtEfD`GnDxGhGbMlIjQnCrFlAnCjBbFrDrKpB~E|AvC|C`F~BtDvDxGjFbKdAtBhAtClAnDfAdEd@|Bd@pC\\|BX`CXtDNbDFhD?jFE|BOjDU`DOpAi@xDaD`QqHp`@uDfS}BzKYhAeAzCe@fAwAfCy@jAeAnAkAhAiAbA{@l@{CdBmGfCsCdAoB`AaB~@aCfBaBzAwCfDgFrH{ElGgJtMgEpF}BdC{GnG}OhOcA|@eDbCwCnBoGlDmChAmCbAoEvAiAX_GdAeGr@{CTgDJmD@kLO}CKmCCeFH}BNuBR_C\\WGuBJaA?wAKwB_@uCy@wEaBQ?eCo@eBS}MYiCFuEBgCCwA@k@C}Ei@aB]aI_CwCcAwB{@iBa@cBo@}Bk@}Ba@kBY}@UaAGcDI{FWwGQ_CGeB?kGYsHWoCOmCDmAFmARkBd@iBb@gDz@oA\\{Dx@eDZc@@oGUsEe@gAUcBo@mAq@}@YmAq@yCaCaBsAoF}EwAeA}Ay@cA_@{A_@}COsCF{G\\mADu@?iGZiBB_HQkBJy@LqA\\wAl@_Aj@gA|@]`@uBfDYv@Wz@{A|F]~@}@fBW\\yBrBqAv@aAb@qCp@eDn@s@PuAh@cEdBuB`@kBHwAAcBQeEy@_BQuAEmBFeAPiBf@yAv@kAz@gAhAs@`A]p@g@hA]fAa@nBQzAIfB?fB^bKn@`Mh@jI@bAChBSrB[lBe@fBo@|Ai@bAeAzA{AvAy@j@uAt@cA^{A\\aBNoABaBGcAKyA[aGsBkPeFcFaB{A_@_BWgBK{@A[HcBFcCXgAX]Pq@NcCfAiBbAsVjLiC`Bu@p@y@x@gAzAm@fAaAjCgAfD}CdJw@pCUnAa@fDQnAc@rBe@zA]v@q@pAg@p@[\\eAv@aEfB}AbAw@\\k@\\{@t@sBfCuBjDaAhAm@l@aAx@aAb@g@Zy@TiBXeAFe@@oAM{Cm@aIkCiCi@iC[kCSmFCuBIcDq@qA_@kAk@_M_IsBkAkMkI{CgBmCoAo@Wy@O{Bq@qD]qCQeA@e@D_Fv@iQjFyMjDoBl@yAn@wGxBc@Js@F_CXsFd@wGt@oF`@oBJgB?[AqLRoAFoC@kINiBNwGrAcEjAoK|DqA`@_ATcBPyBHq@CaCUkBUiAOwA[iAMsBI_ABaBXeARoDl@kBT{Ft@oD`@e@HoHp@_DN{EJeL^cBFmFVgCFwBAsDJ{@FqC@gFG{FQaDQ_GMuEQuAHsANoA^mBr@_Ab@mDpBiGhC}@XsCjAqK|EoFvBiD`A_HbBqGnBuJ|CkALsB?g@CqCYiB]w@YwAs@oAeAaAeAe@a@uBgCaBgCeBoBoAaAwAw@]Qw@WcAUeCWoBAmDd@kBd@uDnBaCvAmB~@}DpAiCh@{AFuAAsDQkAImDIgAAgEFcCCuBPgBb@oAd@qCzAeBbAkBzAgGdGeAz@eCjByAtAwBxBeAt@kDtCsGnGgAp@_Bv@kDz@uDn@}FnAkALsHfBwA^aDj@{FrAaC`@mB\\kBFcAEmBY{@]a@QgBe@kDu@wE}AyBy@aAUkCg@oDo@_AMyGw@}@Cs@B[CiAQ{@]c@Ys@q@[a@i@cAi@gBUsACg@AeCBs@CIp@s\\BeIHoBf@oDxBwJPcADuAg@gFYoBsBt@gAf@g@b@eClAwA`Ao@r@yPlUeBzBeBfBq@f@w@`@a@NcBX{@@_@E[OYUWYsDcF{BaDg@e@kB}@s@_@uF}Ag@GiDBc@AmAMwBo@cBu@]QQS{AqCc@]_@OeAOiA@iGPw@AeB]kI}B}Cs@iHiAiL}B{r@iO}E_Ai@EsA?yGVoACoC_@}@EaALeBd@k@ZmD~BqLdEaBr@cDdB}IhF}CbBoGrCwGlBk@Xu@h@_F~EeBpBa@`@UNg@JmBJw@PgA`@}AAs@IqCw@iBYi@U_Aw@[MeC_@m@Ao@P]VST{@|AYZc@VkC`A}CxAm@Lo@?[Cc@MaAe@mAq@cHkEo@Yi@Ga@@WDa@L_QlHy@`@q@d@c@p@o@rBkA~DKJe@|@QN_@P_@Be@C{@YWG}IiHQYw@q@g@a@_@OWAe@He@PkQhJgAd@i@Pw@LgB@iDMo@HQF_@TiAdA_@Nq@HeJCa@H_IAq@Cw@MmC}@}FiCqBs@{AYMKy@WoAy@cBiB_AoA[UQIoD{@eHkCYE_@@SBe@PqKxFOe@q@mNg@}Lm@aM]mFa@eJPA^XRH"
+  }
+}
