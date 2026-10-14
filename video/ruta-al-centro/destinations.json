@@ -1,0 +1,124 @@
+{
+  "centro": {
+    "query": {
+      "address": "Av. Edén y Pres. Arturo Illia, La Falda, Córdoba"
+    },
+    "title": [
+      "Cómo llegar",
+      "al centro"
+    ],
+    "label": "Av. Edén",
+    "sublabel": "Centro de La Falda",
+    "cardTo": "Av. Edén, en el centro"
+  },
+  "anfiteatro": {
+    "query": {
+      "placeId": "ChIJX6ZWQPmCLZQRccv8YJI5-lg"
+    },
+    "title": [
+      "Cómo llegar",
+      "al Anfiteatro"
+    ],
+    "label": "Anfiteatro",
+    "sublabel": "La Falda",
+    "cardTo": "el Anfiteatro de La Falda"
+  },
+  "hotel-eden": {
+    "query": {
+      "placeId": "ChIJad5T0U2ZMpQRXyKjTvditDY"
+    },
+    "title": [
+      "Cómo llegar",
+      "al Hotel Edén"
+    ],
+    "label": "Hotel Edén",
+    "sublabel": "La Falda",
+    "cardTo": "el Hotel Edén"
+  },
+  "cordoba": {
+    "trip": true,
+    "query": {
+      "placeId": "ChIJry8L6wKZMpQRgunGjUe7gkM"
+    },
+    "title": [
+      "Desde Córdoba",
+      "hasta las cabañas"
+    ],
+    "label": "Córdoba",
+    "sublabel": "",
+    "cardFrom": "Córdoba",
+    "via": "por Autopista Punilla y RN 38 · con peaje",
+    "waypoints": [
+      {
+        "label": "Villa Carlos Paz",
+        "latLng": {
+          "lat": -31.4241,
+          "lng": -64.4978
+        }
+      },
+      {
+        "label": "Cosquín",
+        "latLng": {
+          "lat": -31.245,
+          "lng": -64.4656
+        }
+      }
+    ],
+    "roads": [
+      {
+        "label": "Autopista Punilla",
+        "near": {
+          "lat": -31.33,
+          "lng": -64.455
+        }
+      },
+      {
+        "label": "Ruta Nacional 38",
+        "shield": "38",
+        "near": {
+          "lat": -31.17,
+          "lng": -64.475
+        }
+      }
+    ]
+  },
+  "aeropuerto": {
+    "trip": true,
+    "query": {
+      "placeId": "ChIJdSmRTsSbMpQRD8PnyLLzWws"
+    },
+    "title": [
+      "Desde el aeropuerto",
+      "hasta las cabañas"
+    ],
+    "label": "Aeropuerto",
+    "sublabel": "Córdoba (COR)",
+    "cardFrom": "el Aeropuerto de Córdoba",
+    "via": "por Camino del Cuadrado · con peaje",
+    "waypoints": [
+      {
+        "label": "Río Ceballos",
+        "latLng": {
+          "lat": -31.165,
+          "lng": -64.322
+        }
+      },
+      {
+        "label": "Salsipuedes",
+        "latLng": {
+          "lat": -31.1372,
+          "lng": -64.2958
+        }
+      }
+    ],
+    "roads": [
+      {
+        "label": "Camino del Cuadrado",
+        "near": {
+          "lat": -31.121,
+          "lng": -64.4
+        }
+      }
+    ]
+  }
+}

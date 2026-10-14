@@ -1,0 +1,35 @@
+{
+  "origin": {
+    "address": "Av. Teresa M. de Ferrarini 1100",
+    "latLng": {
+      "lat": -31.1005613,
+      "lng": -64.4724555
+    }
+  },
+  "destination": {
+    "id": "hotel-eden",
+    "query": {
+      "placeId": "ChIJad5T0U2ZMpQRXyKjTvditDY"
+    },
+    "title": [
+      "Cómo llegar",
+      "al Hotel Edén"
+    ],
+    "label": "Hotel Edén",
+    "sublabel": "La Falda",
+    "cardTo": "el Hotel Edén",
+    "latLng": {
+      "lat": -31.091686199999994,
+      "lng": -64.4692373
+    }
+  },
+  "drive": {
+    "meters": 1385,
+    "seconds": 301,
+    "polyline": "fiy|DnhohKSI_@YQ@NvCkHj@eAHFjEWa@wB{E[[qD}CiA{@qCeCaBsAqEyDmBGsCC}AAuAB_@wBAE"
+  },
+  "walk": {
+    "meters": 1385,
+    "seconds": 1309
+  }
+}

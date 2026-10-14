@@ -1,0 +1,58 @@
+{
+  "origin": {
+    "address": "Av. Teresa M. de Ferrarini 1100",
+    "latLng": {
+      "lat": -31.1005613,
+      "lng": -64.4724555
+    }
+  },
+  "destination": {
+    "id": "aeropuerto",
+    "trip": true,
+    "query": {
+      "placeId": "ChIJdSmRTsSbMpQRD8PnyLLzWws"
+    },
+    "title": [
+      "Desde el aeropuerto",
+      "hasta las cabañas"
+    ],
+    "label": "Aeropuerto",
+    "sublabel": "Córdoba (COR)",
+    "cardFrom": "el Aeropuerto de Córdoba",
+    "via": "por Camino del Cuadrado · con peaje",
+    "waypoints": [
+      {
+        "label": "Río Ceballos",
+        "latLng": {
+          "lat": -31.165,
+          "lng": -64.322
+        }
+      },
+      {
+        "label": "Salsipuedes",
+        "latLng": {
+          "lat": -31.1372,
+          "lng": -64.2958
+        }
+      }
+    ],
+    "roads": [
+      {
+        "label": "Camino del Cuadrado",
+        "near": {
+          "lat": -31.121,
+          "lng": -64.4
+        }
+      }
+    ],
+    "latLng": {
+      "lat": -31.315533499999997,
+      "lng": -64.21388449999999
+    }
+  },
+  "drive": {
+    "meters": 52211,
+    "seconds": 3288,
+    "polyline": "`ic~Dvw|fKoCF[JKRIh@BPfAnC^h@|@LTNNV?~AIz@GTi@l@aAz@mDxBcBbAMPIX{D`B}Bt@sHvByAd@sVlKqPxGsBt@aAXww@f[{IdDkVrJia@jP{@PmBBWDg@Ti@f@w@z@w@f@iXlKmYlLgW`K}VtJaJxDmeAdb@_Ch@k@He@TcA|@mAl@_C|@oOjG}Ap@gMfF_ARoCVo@Tq@n@w@z@k@`@gHxCmKtFsUdMkDfBsRvIsAp@w@f@eAv@mAlAw@dAsB|C}OvW{CzEeAjBcBbCmBzC_B|BuAzB{FzIeBrBcBxAeBhA_Bt@s@VmAR_A@}@Eg@Im@@i@PiB|@{@NiMhAcFj@{AXgA`@eAh@iT`NiEhCyIvFcTnM{LtHqM~H_E~B]Nc@H{Bh@y@^o@h@iA|Ag@h@sD|B_StLcGlD{CpAcK|D_C`Aa@JkAHKHU?OLCD]X]\\m@\\iIbDaKzDmCjA}AdAyAlAuAvAsF`GaEzDiHhG_@Pi@FUBMJmBD{@LaBd@g@Tu@f@oDhC{A~@iAb@aBZwAHuAGcAS_A[w@e@mA{@m@]aAa@qAU_f@uCw@Me@SMUSKWBOPGXDTFJAl@_AfECj@HhACr@}D~Og@tA{@zASv@Qr@S`@SFi@Pc@BwA?a@O[OiAK[@YNWXSVSf@[|@_@v@QR_@VyAj@kAp@m@n@gAjBe@z@a@f@_@ZuAv@eA\\o@LoCR{AL_Cx@[BcG@]Ba@PSTiAtBoFbHo@bAe@jCO|Aq@nEe@pCWlB[p@[ZcAn@kBhAa@F{AFwAh@YFwBLkHfA[PORo@j@uAhBKb@Cf@HfBCb@Qn@W`@UTo@d@WVO\\Ov@?j@Fj@Rp@n@xAHZDj@ChAk@|HWnAa@`Aq@t@gIpHeAx@YNm@P_@?i@Em@S_@]QW_@y@[y@q@}A]a@e@[OGaAQaCOkACy@Ja@L]Ro@j@_EbE_CdCgHbHu@n@s@\\q@Rq@H_A@w@Oo@U[Q_@YgD}Cy@q@_@Oa@Eg@BYHsEjC{DnCu@VaBPYH{@b@i@l@sAvB[\\o@VwAh@c@\\Yd@Yn@[dCKvA@lBBl@ZtBT|@lA~Cd@bA^r@h@r@n@l@hAv@n@Zj@R|AXt\\fBp@Lv@\\\\Xj@r@b@z@Pn@JhACnAM`A[|@c@r@YZ]VaA`@iDfAYJQL_@f@Uj@Ib@Bp@Lv@z@bCV~@F\\Br@Gn@Sr@W^_@^SN{@Ny@C]Kw@c@k@g@MQiByDW_@[Wq@Uc@Cm@HSFc@\\Y^Sd@Ed@CdAIZ]z@WZ}@l@a@d@O`@Kn@?v@Fd@~DdMLp@F~@Cz@SnAc@fA_@h@eA~@oEpD[`@Qf@Gd@AfAI`@MXuAbC_@z@mA|DO|@E|@@hAJtA?b@LzAV|ERrB|@bEHLt@nChAnF\\jBP|ARxC@hECfAStDBz@Lx@Pn@dB~Dx@dBNh@Fn@A`@Ef@Kf@cAfCQr@Gv@UvGK`@y@rAeBvB]h@Wh@Gn@?`@P|@d@fAx@rAL\\D\\Af@Gf@M\\[f@kC~CQd@GXCx@Jn@HVR\\RR^T`@Jd@XNNR`@Ph@\\rCLb@Zl@`@Z\\Nh@Fb@CbFaAn@Bd@PRP`@p@HZDf@?f@Or@[f@QLY`@[t@Id@@t@DVJ\\PXZb@tAtA^r@Ph@JdA?~@M~A?b@Hd@Xl@PPVNTHrDv@lA`@`@Vh@h@Zn@XtADh@@zAGvGU|FQvBIlBStIFz@HZJRX\\vD|C~@jA`@n@Td@j@pBLn@Hp@DrAElCMzAo@fGM`A]lAk@pA}@tAuBnCk@|@_@hAQdACf@DbAPdAb@z@xBrCl@f@XPZL`@HV@tCMt@@PBr@^\\`@NZHXHd@Ap@O~@s@zBs@lBkAhDoD~JO|@EfAD`AFX^lAr@hBTz@Hh@^fFTfEDrBCt@E`@Q`AY|@o@`AUXk@d@cAh@uB|@cAp@s@p@s@~@w@|A[lAUtAM`B_@xLKfAIh@e@jA]h@a@\\eAj@aIfBoTrE_A\\w@d@{@v@sAdBu@v@q@n@cAj@mA^sAJaBCaASeAa@gBgAaQ}LwDmC{By@o@Ow@M}BJaARc]nJaANg@@s@G_AUmBq@{Ao@iDcAi@KwACiANe@NkAh@gE|ByGjD{@l@e@r@Yr@UnASfEWrDYtCc@`DQbAaCxIUxAE\\C~@AbCAf@QbAOj@Sf@aArASR_Bt@c@XSTOVIXM|@@z@DZ\\r@f@l@r@ZpARjDJh@Ff@T`@^Vn@Df@Af@UnAgAzC]|ACv@Df@HXV\\\\XzAZzAPd@Cb@MTSb@q@XY^Ub@IfIAR@l@XZd@z@nCRf@T^z@f@dARnBVnBj@TPPRRn@DZBn@C|@FnANh@p@tBHx@CXOj@[f@aCdBQZMb@M~@SvCBv@F\\JTVZl@RzAXz@TfAf@h@\\j@j@hAz@h@Hj@@zAGv@?`C^`@Fd@NXVPb@HZPzANr@X`@jBrAZZVt@Fj@AXMjAS`AKVs@v@_DxAcFvBi@Hq@Ai@Ks@_@OOUa@Sg@_@sBQgAYeASUe@WWIu@Bc@BgHfAYH_@X]h@Ih@?j@HdACpAIb@U`@e@b@mAj@{@d@uB|@k@HM?a@Ga@UoAkAOKWISA[DQFSPS\\IXC\\B^FZLVVXTJh@DvBDl@BbAj@t@Zd@Hd@?dC[bASVKXU\\g@l@kB^c@^OVCj@H^TNTNb@^xBFNVb@ZVj@V~@Rn@b@`AtAZd@d@d@l@Z~EvA`APd@FT?b@G^Qb@i@LSh@_CNa@`@g@zBaBn@Uz@ATF\\VTb@B^?VCXQj@ORgAfA{@fAyAzC]l@]Zo@RYBkCIW@m@P{DrBa@^[n@Id@?r@P|@l@bAbAlATNXLn@L`@@^Ih@Uf@g@j@gAt@mB`@q@b@g@^[|@a@r@KbACj@DRFx@Zn@`@p@j@LTv@f@NHgAf@eAzAW`@c@Xg@J{Dd@_ANgAb@WTo@lBw@fA{@FmEPuBBoAOgAa@mAe@OCYDsAH{AXmAV}@HoKNgBxL{@bDOz@KlA?n@JdAXzBNjDPA^XRH"
+  }
+}

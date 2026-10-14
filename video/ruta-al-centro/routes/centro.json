@@ -1,0 +1,35 @@
+{
+  "origin": {
+    "address": "Av. Teresa M. de Ferrarini 1100",
+    "latLng": {
+      "lat": -31.1005613,
+      "lng": -64.4724555
+    }
+  },
+  "destination": {
+    "id": "centro",
+    "query": {
+      "address": "Av. Edén y Pres. Arturo Illia, La Falda, Córdoba"
+    },
+    "title": [
+      "Cómo llegar",
+      "al centro"
+    ],
+    "label": "Av. Edén",
+    "sublabel": "Centro de La Falda",
+    "cardTo": "Av. Edén, en el centro",
+    "latLng": {
+      "lat": -31.092637699999997,
+      "lng": -64.4779807
+    }
+  },
+  "drive": {
+    "meters": 1497,
+    "seconds": 233,
+    "polyline": "fiy|DnhohKSI_@YQ@j@xLRxCl@`Me@@_Kv@EoBwBHyCRuBFuBP{Jb@iH`@"
+  },
+  "walk": {
+    "meters": 1316,
+    "seconds": 1214
+  }
+}
