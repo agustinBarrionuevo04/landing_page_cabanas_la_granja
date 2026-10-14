@@ -5,8 +5,13 @@ import { whatsappUrl } from "@/lib/site"
 const HERO_MESSAGE = "Hola! Me interesa hacer una reserva en Cabañas la Granja."
 
 export function HeroSection() {
+  // min-h + padding superior: si el contenido no entra (pantallas bajas), el hero crece hacia abajo
+  // en vez de meterse debajo del header fijo
   return (
-    <section id="inicio" className="relative flex h-svh min-h-[560px] items-end overflow-hidden bg-primary">
+    <section
+      id="inicio"
+      className="relative flex min-h-svh items-end overflow-hidden bg-primary pt-[calc(var(--header-height)+2rem)]"
+    >
       <div className="hero-media absolute inset-0">
         <Image
           src="/fondo_principal.jpeg"
@@ -29,7 +34,7 @@ export function HeroSection() {
           La Falda · Sierras de Córdoba
         </p>
         <h1
-          className="hero-in max-w-4xl font-display text-5xl font-medium leading-[0.98] tracking-[-0.01em] sm:text-6xl md:text-8xl"
+          className="hero-in max-w-4xl font-display text-[clamp(3rem,min(9vw,11svh),6rem)] font-medium leading-[0.98] tracking-[-0.01em]"
           style={{ "--i": 1 } as React.CSSProperties}
         >
           Viví la tranquilidad de las sierras
